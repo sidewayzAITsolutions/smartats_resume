@@ -7,11 +7,11 @@ import Link from 'next/link';
 import { Mail, Lock, Loader2, AlertCircle, Target, Info } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import OAuthDebug from '@/components/OAuthDebug';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClientComponentClient();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,10 +42,11 @@ export default function LoginPage() {
   useEffect(() => {
     const checkUser = async () => {
       try {
+        const supabase = createClient();
         const { data: { user }, error } = await supabase.auth.getUser();
 
         if (error) {
-          console.log('No active session');
+          console.log('No active session:', error.message);
           setCheckingAuth(false);
           return;
         }
@@ -59,12 +60,13 @@ export default function LoginPage() {
         setCheckingAuth(false);
       } catch (err) {
         console.error('Error checking auth status:', err);
+        setError('Configuration error: Please check your environment variables');
         setCheckingAuth(false);
       }
     };
 
     checkUser();
-  }, [router, supabase.auth]);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +74,7 @@ export default function LoginPage() {
     setError('');
 
     try {
+      const supabase = createClient();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -127,6 +130,7 @@ export default function LoginPage() {
       const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent('/templates')}`;
       console.log('Redirect URL:', redirectTo);
 
+      const supabase = createClient();
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
