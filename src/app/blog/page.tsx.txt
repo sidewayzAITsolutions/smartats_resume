@@ -1,0 +1,32 @@
+// app/blog/page.tsx
+    'use client';
+
+    import Link from 'next/link';
+    import { Button } from '@/components/ui/Button';
+    import { BookOpen, ArrowLeft } from 'lucide-react';
+
+    export default function BlogPage() {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-4">
+          <div className="w-full max-w-4xl flex justify-start mb-8">
+            <Link href="/" passHref>
+              <Button variant="outline" className="flex items-center gap-2 bg-white hover:bg-gray-100">
+                <ArrowLeft className="w-4 h-4" /> Back to Home
+              </Button>
+            </Link>
+          </div>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full text-center border border-gray-200">
+            <BookOpen className="w-20 h-20 text-green-500 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">ATS Guide & Blog</h1>
+            <p className="text-gray-600 mb-8">
+              Discover articles and tips to master Applicant Tracking Systems and boost your job search.
+              (Content coming soon!)
+            </p>
+            <Link href="/builder" passHref>
+              <Button>Build Your Optimized Resume</Button>
+            </Link>
+          </div>
+        </div>
+      );
+    }
+    
