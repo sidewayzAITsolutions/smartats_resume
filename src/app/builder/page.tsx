@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import DebugSectionNavigation from '@/components/OAuthDebug';
 import Navigation from '@/components/Navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 
 import {
   FileText, Star, Shield, Zap, Filter, CheckCircle, Lock,
@@ -192,10 +193,10 @@ const PremiumUpgradeBanner = ({ feature }: { feature: string }) => (
 );
 
 // Section Navigation Component with Premium Badges
-const SectionNav = ({ currentSection, setCurrentSection, userData }: { 
-  currentSection: SectionName; 
+const SectionNav = ({ currentSection, setCurrentSection, isPremium }: {
+  currentSection: SectionName;
   setCurrentSection: (section: SectionName) => void;
-  userData: UserData | null;
+  isPremium: boolean;
 }) => {
   const handleSectionClick = (sectionId: SectionName) => {
     console.log('Clicking section:', sectionId);
@@ -225,7 +226,7 @@ const SectionNav = ({ currentSection, setCurrentSection, userData }: {
           >
             {section.icon}
             <span className="hidden sm:inline">{section.label}</span>
-            {section.isPremium && !userData?.isPremium && (
+            {section.isPremium && !isPremium && (
               <Crown className="w-3 h-3 text-pink-400 absolute -top-1 -right-1" />
             )}
           </button>
@@ -255,7 +256,8 @@ const OverviewSection = ({
     handleFileUpload,
     uploadedFile,
     setUploadedFile,
-    userData
+    userData,
+    isPremium
   }: any) => (
     <div className="space-y-6">
       {/* Welcome Card */}
@@ -278,7 +280,7 @@ const OverviewSection = ({
                 <User className="w-5 h-5" />
                 Start Building
               </button>
-              {userData?.isPremium ? (
+              {isPremium ? (
                 <button
                   onClick={() => {
                     const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/linkedin')}&scope=r_liteprofile%20r_emailaddress`;
@@ -1799,7 +1801,10 @@ const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, use
 
 
 const EnhancedATSResumeBuilder = () => {
-  
+
+  // Premium status hook
+  const { isPremium, loading: premiumLoading, refreshStatus } = usePremiumStatus();
+
   // State Management
   const [currentSection, setCurrentSection] = useState<SectionName>('overview');
 
@@ -2912,6 +2917,7 @@ const renderSectionContent = () => {
                     updateResumeData={updateResumeData}
                     handleAddProject={handleAddProject}
                     userData={userData}
+                    isPremium={isPremium}
                 />;
       default:
         return <OverviewSection
@@ -2934,6 +2940,7 @@ const renderSectionContent = () => {
                     uploadedFile={uploadedFile}
                     setUploadedFile={setUploadedFile}
                     userData={userData}
+                    isPremium={isPremium}
                 />;
     }
   };
@@ -3235,7 +3242,7 @@ return (
       </div>
 
       <div className="flex-1">
-        <SectionNav currentSection={currentSection} setCurrentSection={handleSectionChange} userData={userData} />
+        <SectionNav currentSection={currentSection} setCurrentSection={handleSectionChange} isPremium={isPremium} />
 
         <div className="max-w-6xl mx-auto p-6" key={currentSection}>
           {renderSectionContent()}

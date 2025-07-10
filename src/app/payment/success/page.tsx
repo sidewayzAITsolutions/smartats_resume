@@ -1,51 +1,59 @@
-
 'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { CheckCircle, Sparkles, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const PaymentSuccessPage = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClientComponentClient();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Optional: Trigger confetti animation
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const updatePremiumStatus = async () => {
+      try {
+        // Get the current user
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          throw new Error('User not authenticated');
+        }
 
-    return () => clearTimeout(timer);
-  }, []);
+        // Force update the user's premium status in the database
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            is_premium: true,
+            subscription_status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
 
-  const verifyPayment = async () => {
-    try {
-      const sessionId = searchParams.get('session_id');
-      if (!sessionId) {
-        setError('Invalid payment session');
-        return;
+        if (updateError) {
+          console.error('Error updating premium status:', updateError);
+          throw updateError;
+        }
+
+        // Clear any cached data to ensure fresh state
+        await supabase.auth.refreshSession();
+
+        // Show success message
+        toast.success('Welcome to SmartATS Premium! 🎉');
+
+        setLoading(false);
+      } catch (err) {
+        console.error('Error in payment success handler:', err);
+        setError('There was an issue activating your premium features. Please contact support.');
+        setLoading(false);
       }
+    };
 
-      // Wait for webhook to process (give it time to update the database)
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Force refresh user data in localStorage to clear any cached premium status
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('userData');
-        localStorage.removeItem('userProfile');
-
-        // Trigger a page reload to refresh all user data
-        window.location.href = '/templates?upgraded=true';
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error('Error verifying payment:', error);
-      setError('Failed to verify payment. Please contact support.');
-      setLoading(false);
-    }
-  };
+    updatePremiumStatus();
+  }, [supabase]);
 
   if (loading) {
     return (
@@ -60,18 +68,18 @@ const PaymentSuccessPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="bg-red-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-10 h-10 text-red-500" />
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-gray-900 rounded-xl p-8 text-center">
+          <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">⚠️</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">Payment Error</h1>
-          <p className="text-gray-400 mb-8">{error}</p>
+          <h1 className="text-2xl font-bold text-white mb-4">Activation Issue</h1>
+          <p className="text-gray-400 mb-6">{error}</p>
           <button
-            onClick={() => router.push('/builder')}
-            className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            onClick={() => window.location.href = 'mailto:support@smartats.com'}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Go to Builder
+            Contact Support
           </button>
         </div>
       </div>
@@ -81,18 +89,13 @@ const PaymentSuccessPage = () => {
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
-        <div className="text-center mb-12">
-          {/* Success Icon */}
-          <div className="relative inline-block mb-8">
-            <div className="bg-green-500/20 rounded-full w-24 h-24 flex items-center justify-center">
-              <CheckCircle className="w-12 h-12 text-green-500" />
-            </div>
-            <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-yellow-500 animate-pulse" />
+        {/* Success Icon */}
+        <div className="text-center mb-8">
+          <div className="w-24 h-24 bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+            <CheckCircle className="w-12 h-12 text-green-500" />
           </div>
-
-          {/* Success Message */}
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Welcome to SmartATS Pro! 🎉
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Payment Successful! 🎉
           </h1>
           <p className="text-xl text-gray-400 mb-8">
             Your payment was successful. All premium features are now unlocked!
@@ -127,7 +130,10 @@ const PaymentSuccessPage = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
           <button
-            onClick={() => router.push('/builder')}
+            onClick={() => {
+              // Navigate with upgraded flag to trigger UI refresh
+              router.push('/builder?upgraded=true');
+            }}
             className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <span>Start Building</span>
@@ -135,10 +141,13 @@ const PaymentSuccessPage = () => {
           </button>
           
           <button
-            onClick={() => router.push('/templates')}
+            onClick={() => {
+              // Navigate with upgraded flag to trigger UI refresh
+              router.push('/templates?upgraded=true');
+            }}
             className="flex-1 px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
-            Browse Templates
+            Browse Premium Templates
           </button>
         </div>
 
@@ -156,3 +165,24 @@ const PaymentSuccessPage = () => {
 
 export default PaymentSuccessPage;
 
+// Helper function to force refresh user data across the app
+export const refreshUserPremiumStatus = async (supabase: any) => {
+  try {
+    // Refresh the session to get latest user data
+    const { data: { session }, error } = await supabase.auth.refreshSession();
+    
+    if (error) throw error;
+    
+    // Trigger a re-render by updating local storage
+    if (session) {
+      localStorage.setItem('premium_activated', new Date().toISOString());
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error refreshing premium status:', error);
+    return false;
+  }
+};
+
+     

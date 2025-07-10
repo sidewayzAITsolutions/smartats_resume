@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { usePremiumStatus } from '@/hooks/usePremiumStatus';
 
 // Premium Upgrade Banner Component
 const PremiumUpgradeBanner = () => (
@@ -43,11 +44,15 @@ const EnhancedTemplatesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showPreview, setShowPreview] = useState(null);
   const [hoveredTemplate, setHoveredTemplate] = useState(null);
-  const [userData, setUserData] = useState<{isPremium: boolean; email?: string; name?: string} | null>(null);
 
-  // Check user status on component mount
+  // Use the premium status hook
+  const { isPremium, loading: premiumLoading, error: premiumError, refreshStatus } = usePremiumStatus();
+
+  const [userData, setUserData] = useState<{email?: string; name?: string} | null>(null);
+
+  // Check user basic data on component mount
   useEffect(() => {
-    const checkUserStatus = async () => {
+    const checkUserData = async () => {
       try {
         const supabase = createClientComponentClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -58,10 +63,10 @@ const EnhancedTemplatesPage = () => {
           return;
         }
 
-        // Get user profile with premium status
+        // Get basic user profile data (premium status handled by hook)
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('email, full_name')
           .eq('id', user.id)
           .single();
 
@@ -69,30 +74,24 @@ const EnhancedTemplatesPage = () => {
           console.error('Error fetching user profile:', profileError);
           // Fallback to basic user data
           setUserData({
-            isPremium: false,
             email: user.email || '',
             name: user.user_metadata?.full_name || 'User'
           });
           return;
         }
 
-        // Set user data with real premium status
+        // Set user data (premium status comes from hook)
         setUserData({
-          isPremium: profile?.is_premium || profile?.subscription_status === 'active',
           email: profile?.email || user.email || '',
           name: profile?.full_name || user.user_metadata?.full_name || 'User'
         });
-
-        console.log('User premium status:', profile?.is_premium || profile?.subscription_status === 'active');
       } catch (error) {
         console.error('Error checking user status:', error);
         setUserData(null);
       }
     };
 
-    checkUserStatus();
-
-    // Check for upgrade parameter and refresh user data
+    checkUserData();
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('upgraded') === 'true') {
       // Clear any cached data and refresh user status
@@ -738,7 +737,7 @@ const EnhancedTemplatesPage = () => {
                 <button
                   onClick={() => {
                     onClose();
-                    if (template.isPremium && userData && !userData.isPremium) {
+                    if (template.isPremium && !isPremium) {
                       // Redirect to pricing for premium templates if user is not premium
                       window.location.href = '/pricing';
                     } else {
@@ -747,12 +746,12 @@ const EnhancedTemplatesPage = () => {
                     }
                   }}
                   className={`flex-1 font-semibold py-3 rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2 ${
-                    template.isPremium && userData && !userData.isPremium
+                    template.isPremium && !isPremium
                       ? 'bg-gradient-to-r from-pink-600 to-pink-500 text-white'
                       : 'bg-gradient-to-r from-teal-600 to-amber-600 text-white'
                   }`}
                 >
-                  {template.isPremium && userData && !userData.isPremium ? (
+                  {template.isPremium && !isPremium ? (
                     <>
                       <Crown className="w-5 h-5" />
                       Upgrade to Use
@@ -1417,7 +1416,7 @@ const EnhancedResumePreview = ({ template }) => {
                   {/* Enhanced Action Button */}
                   <button
                     onClick={() => {
-                      if (template.isPremium && userData && !userData.isPremium) {
+                      if (template.isPremium && !isPremium) {
                         // Redirect to pricing for premium templates if user is not premium
                         window.location.href = '/pricing';
                       } else {
@@ -1431,7 +1430,7 @@ const EnhancedResumePreview = ({ template }) => {
                         : 'bg-gradient-to-r from-teal-600 to-amber-600 text-white hover:shadow-lg'
                     }`}
                   >
-                    {template.isPremium && userData && !userData.isPremium ? (
+                    {template.isPremium && !isPremium ? (
                       <>
                         <Crown className="w-5 h-5" />
                         Upgrade for $19.99/mo
@@ -1452,7 +1451,7 @@ const EnhancedResumePreview = ({ template }) => {
       </section>
 
       {/* Premium Banner for Non-Premium Users */}
-      {userData && !userData.isPremium && (
+      {!isPremium && (
         <section className="py-12 px-6">
           <div className="max-w-5xl mx-auto">
             <PremiumUpgradeBanner />
