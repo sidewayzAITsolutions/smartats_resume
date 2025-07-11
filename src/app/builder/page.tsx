@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, JSX } from 'react';
 // Import for PDF generation
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import DebugSectionNavigation from '@/components/OAuthDebug';
-import Navigation from '@/components/Navigation';
+import UnifiedNavigation from "@/components/UnifiedNavigation";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { usePremiumStatus } from '@/hooks/usePremiumStatus';
-
+import { ResumeBuilder } from "@/components/ResumeBuilder/ResumeBuilder"
 import {
   FileText, Star, Shield, Zap, Filter, CheckCircle, Lock,
   TrendingUp, Award, Users, Clock, ArrowRight, X, Sparkles,
@@ -23,6 +22,10 @@ import {
   MessageSquare, BookOpen, Settings, BarChart3, Home, Upload, LogOut
 } from 'lucide-react';
 import OAuthDebug from '@/components/OAuthDebug';
+import Navigation from '@/components/Navigation';
+
+// DRY: Lock icon for non-premium sections
+const NonPremiumLockIcon = () => <Lock className="w-4 h-4 text-pink-400" />;
 
 
 interface UserData {
@@ -131,46 +134,80 @@ interface CustomSection {
 
 // Define the structure for your resume data
 interface ResumeData {
-  personalInfo: {
-    name: string;
+  personal: {
+    fullName: string;
+    title: string;
     email: string;
     phone: string;
-    address: string;
+    location: string;
+    linkedin: string;
+    portfolio: string;
+    github: string;
   };
+  summary: string;
   experience: Array<{
     id: number;
     company: string;
-    role: string;
+    position: string;
     startDate: string;
     endDate: string;
+    current: boolean;
+    location: string;
     description: string;
+    achievements: string[];
   }>;
   education: Array<{
     id: number;
     school: string;
     degree: string;
-    gradDate: string;
+    field: string;
+    startYear: string;
+    endYear: string;
+    gpa?: string;
+    honors?: string;
   }>;
   skills: string[];
+  certifications: string[];
+  licenses: string[];
+  languages: string[];
+  projects: Array<{
+    id: number;
+    name: string;
+    description: string;
+    technologies: string[];
+    link: string;
+    date: string;
+  }>;
+  customSections: CustomSection[];
 }
 
 // Initial empty state for the resume
 const initialResumeData: ResumeData = {
-  personalInfo: {
-    name: '',
+  personal: {
+    fullName: '',
+    title: '',
     email: '',
     phone: '',
-    address: '',
+    location: '',
+    linkedin: '',
+    portfolio: '',
+    github: ''
   },
+  summary: '',
   experience: [
-    { id: 1, company: '', role: '', startDate: '', endDate: '', description: '' },
+    { id: 1, company: '', position: '', startDate: '', endDate: '', current: false, location: '', description: '', achievements: [''] },
   ],
-  education: [{ id: 1, school: '', degree: '', gradDate: '' }],
-  skills: [''],
+  education: [{ id: 1, school: '', degree: '', field: '', startYear: '', endYear: '', gpa: '', honors: '' }],
+  skills: [],
+  certifications: [],
+  licenses: [],
+  languages: [],
+  projects: [],
+  customSections: []
 };
 
 // Define section names type
-type SectionName = 'overview' | 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'additional';
+// (Removed duplicate SectionName type definition)
 
 // Premium Upgrade Banner Component
 const PremiumUpgradeBanner = ({ feature }: { feature: string }) => (
@@ -192,11 +229,14 @@ const PremiumUpgradeBanner = ({ feature }: { feature: string }) => (
   </div>
 );
 
+// Define section names type
+type SectionName = 'overview' | 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'additional';
+
 // Section Navigation Component with Premium Badges
-const SectionNav = ({ currentSection, setCurrentSection, isPremium }: {
-  currentSection: SectionName;
+const SectionNav = ({ currentSection, setCurrentSection, userData }: { 
+  currentSection: SectionName; 
   setCurrentSection: (section: SectionName) => void;
-  isPremium: boolean;
+  userData: UserData | null;
 }) => {
   const handleSectionClick = (sectionId: SectionName) => {
     console.log('Clicking section:', sectionId);
@@ -206,14 +246,14 @@ const SectionNav = ({ currentSection, setCurrentSection, isPremium }: {
   return (
     <div className="bg-gray-900 border-b border-gray-800 sticky top-0 z-20">
       <div className="flex items-center gap-1 p-4 overflow-x-auto">
-        {[
-          { id: 'overview' as SectionName, label: 'Overview', icon: <Home className="w-4 h-4" />, isPremium: false },
-          { id: 'personal' as SectionName, label: 'Personal', icon: <User className="w-4 h-4" />, isPremium: false },
-          { id: 'summary' as SectionName, label: 'Summary', icon: <FileText className="w-4 h-4" />, isPremium: false },
-          { id: 'experience' as SectionName, label: 'Experience', icon: <Briefcase className="w-4 h-4" />, isPremium: false },
-          { id: 'education' as SectionName, label: 'Education', icon: <GraduationCap className="w-4 h-4" />, isPremium: false },
-          { id: 'skills' as SectionName, label: 'Skills', icon: <Zap className="w-4 h-4" />, isPremium: true },
-        ].map(section => (
+        {([
+          { id: 'overview', label: 'Overview', icon: <Home className="w-4 h-4" />, isPremium: false },
+          { id: 'personal', label: 'Personal', icon: <User className="w-4 h-4" />, isPremium: false },
+          { id: 'summary', label: 'Summary', icon: <FileText className="w-4 h-4" />, isPremium: false },
+          { id: 'experience', label: 'Experience', icon: <Briefcase className="w-4 h-4" />, isPremium: false },
+          { id: 'education', label: 'Education', icon: <GraduationCap className="w-4 h-4" />, isPremium: false },
+          { id: 'skills', label: 'Skills', icon: <Zap className="w-4 h-4" />, isPremium: true },
+        ] as { id: SectionName; label: string; icon: JSX.Element; isPremium: boolean }[]).map(section => (
           <button
             key={section.id}
             type="button"
@@ -226,7 +266,7 @@ const SectionNav = ({ currentSection, setCurrentSection, isPremium }: {
           >
             {section.icon}
             <span className="hidden sm:inline">{section.label}</span>
-            {section.isPremium && !isPremium && (
+            {section.isPremium && !userData?.isPremium && (
               <Crown className="w-3 h-3 text-pink-400 absolute -top-1 -right-1" />
             )}
           </button>
@@ -237,7 +277,29 @@ const SectionNav = ({ currentSection, setCurrentSection, isPremium }: {
 };
 
 // Overview Section Component
-const OverviewSection = ({
+interface OverviewSectionProps {
+  setCurrentSection: (section: SectionName) => void;
+  calculateCompletion: () => number;
+  resumeData: any;
+  targetRole: string;
+  industryFocus: string;
+  lastSaved: string | null;
+  setShowPreview: (show: boolean) => void;
+  setShowLoadDialog: (show: boolean) => void;
+  setShowSaveDialog: (show: boolean) => void;
+  saveStatus: string;
+  dragOver: boolean;
+  handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void; 
+  handleDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;  
+  handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  handleFileUpload: (file: File | null) => void;
+  uploadedFile: File | null;
+  setUploadedFile: (file: File | null) => void;
+  userData: UserData | null;
+}
+
+const OverviewSection: React.FC<OverviewSectionProps> = ({
     setCurrentSection,
     calculateCompletion,
     resumeData,
@@ -256,9 +318,8 @@ const OverviewSection = ({
     handleFileUpload,
     uploadedFile,
     setUploadedFile,
-    userData,
-    isPremium
-  }: any) => (
+    userData
+  }) => (
     <div className="space-y-6">
       {/* Welcome Card */}
       <div className="bg-gradient-to-br from-teal-900/50 to-amber-900/50 rounded-2xl p-8 border border-teal-700/50">
@@ -280,7 +341,7 @@ const OverviewSection = ({
                 <User className="w-5 h-5" />
                 Start Building
               </button>
-              {isPremium ? (
+              {userData?.isPremium ? (
                 <button
                   onClick={() => {
                     const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/linkedin')}&scope=r_liteprofile%20r_emailaddress`;
@@ -307,7 +368,11 @@ const OverviewSection = ({
           <div className="hidden lg:block">
             <div className="relative">
               <div className="w-32 h-32 bg-gradient-to-br from-teal-500 to-amber-500 rounded-full opacity-20 animate-pulse"></div>
-              <Rocket className="w-16 h-16 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+              <img
+              src="/horse-logo.png"
+              alt="SmartATS Logo"
+              className="w-16 h-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain"
+              />
             </div>
           </div>
         </div>
@@ -1576,6 +1641,10 @@ const SkillsSection = ({
 };
 
 // Additional Section Component
+/**
+ * Renders additional resume sections such as certifications, licenses, languages, projects, and custom sections,
+ * with premium gating for certain features.
+ */
 const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, userData }: any) => (
   <div className="space-y-6">
     {/* Premium Banner for Non-Premium Users */}
@@ -1588,7 +1657,7 @@ const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, use
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <Award className="w-5 h-5 text-amber-400" />
         Certifications
-        {!userData?.isPremium && <Lock className="w-4 h-4 text-pink-400" />}
+        {!userData?.isPremium && <NonPremiumLockIcon />}
       </h3>
       {userData?.isPremium ? (
         <div className="space-y-3">
@@ -1643,11 +1712,11 @@ const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, use
       </h3>
       {userData?.isPremium ? (
         <div className="space-y-3">
-          {resumeData.licenses.map((cert: string, index: number) => (
+          {resumeData.licenses.map((license: string, index: number) => (
             <div key={index} className="flex items-center gap-2">
               <input
                 type="text"
-                value={cert}
+                value={license}
                 onChange={(e) => updateResumeData('licenses', (prevLicenses: string[]) => {
                   const updated = [...prevLicenses];
                   updated[index] = e.target.value;
@@ -1777,13 +1846,13 @@ const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, use
           </p>
           <button
             onClick={() => {
-              const newSection: CustomSection = {
-                id: generateUniqueId(),
-                title: 'Custom Section',
-                content: ''
-              };
-              updateResumeData('customSections', (prevSections: CustomSection[]) => [...prevSections, newSection]);
-            }}
+              const newSection = {
+                          id: generateUniqueId(),
+                          title: 'Custom Section',
+                          content: ''
+                        };
+                        updateResumeData('customSections', (prevSections: CustomSection[]) => [...prevSections, newSection]);
+                      }}
             className="px-4 py-2 bg-gradient-to-r from-teal-600 to-amber-600 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -1800,28 +1869,32 @@ const AdditionalSection = ({ resumeData, updateResumeData, handleAddProject, use
 );
 
 
+// Move this type to the top-level for consistency and reusability
+type ResumeSectionKey =
+  | 'personal'
+  | 'summary'
+  | 'experience'
+  | 'education'
+  | 'skills'
+  | 'certifications'
+  | 'licenses'
+  | 'languages'
+  | 'projects'
+  | 'customSections';
+
 const EnhancedATSResumeBuilder = () => {
-
-  // Premium status hook
-  const { isPremium, loading: premiumLoading, refreshStatus } = usePremiumStatus();
-
+  
   // State Management
   const [currentSection, setCurrentSection] = useState<SectionName>('overview');
 
   
   // Handle section navigation
   const handleSectionChange = useCallback((newSection: SectionName) => {
-    console.log('Changing section from', currentSection, 'to', newSection);
     setCurrentSection(newSection);
-  }, [currentSection]);
-
-  // Debug effect to track section changes
-  useEffect(() => {
-    console.log('Section changed to:', currentSection);
-  }, [currentSection]);
+  }, []);
   const searchParams = useSearchParams();
   const templateId = searchParams.get('template');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [resumeData, setResumeData] = useState<{
     personal: {
@@ -1944,11 +2017,11 @@ const EnhancedATSResumeBuilder = () => {
   const [industryFocus, setIndustryFocus] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [skillSearchTerm, setSkillSearchTerm] = useState('');
-  const [showSkillSearch, setShowSkillSearch] = useState(false);
+  const [showSkillSearch, setShowSkillSearch] = useState(true);
   const [scoreAnimation, setScoreAnimation] = useState(0);
-  const [showScorePanel, setShowScorePanel] = useState(false);
+  const [showScorePanel, setShowScorePanel] = useState(true);
   const [previousScore, setPreviousScore] = useState(0);
-  const [showScoreIncrease, setShowScoreIncrease] = useState(false);
+  const [showScoreIncrease, setShowScoreIncrease] = useState(true);
   const [scoreIncreaseAmount, setScoreIncreaseAmount] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -1957,13 +2030,13 @@ const EnhancedATSResumeBuilder = () => {
   const [resumeName, setResumeName] = useState('');
   const [savedResumes, setSavedResumes] = useState<SavedResume[]>([]);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
-  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<string>();
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const skillSearchRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const autoSaveRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveRef = useRef<number | NodeJS.Timeout | null>(null);
   const resumePreviewRef = useRef<HTMLDivElement>(null);
-
+  
   // Check user authentication and premium status
   useEffect(() => {
     checkUserStatus();
@@ -2053,7 +2126,7 @@ const EnhancedATSResumeBuilder = () => {
         if (resumeName || resumeData.personal.fullName) {
           autoSaveResume();
         }
-      }, 5000);
+      }, 5000) as unknown as number;
     }
 
     return () => {
@@ -2239,18 +2312,10 @@ const EnhancedATSResumeBuilder = () => {
 
 
   // Update resume data helper
-  type ResumeSectionKey =
-    | 'personal'
-    | 'summary'
-    | 'experience'
-    | 'education'
-    | 'skills'
-    | 'certifications'
-    | 'licenses'
-    | 'languages'
-    | 'projects'
-    | 'customSections';
-
+  /**
+   * Generic helper to update a section of the resume state.
+   * Accepts the section key and an updater function that receives the previous section data and returns the new data.
+   */
   const updateResumeData = <K extends ResumeSectionKey>(
     section: K,
     updater: (prevSectionData: typeof resumeData[K]) => typeof resumeData[K]
@@ -2457,7 +2522,7 @@ const EnhancedATSResumeBuilder = () => {
     setTargetRole(resume.targetRole || '');
     setIndustryFocus(resume.industryFocus || '');
     setResumeName(resume.name);
-    setLastSaved(resume.updatedAt ?? null);
+    setLastSaved(resume.updatedAt);
     setSaveStatus('saved');
     setShowLoadDialog(false);
   };
@@ -2611,11 +2676,15 @@ const EnhancedATSResumeBuilder = () => {
       link: '',
       date: ''
     };
+    updateResumeData('projects', (prevProjects: typeof resumeData.projects) => [...prevProjects, newProject]);
     setCurrentSection('additional');
   };
 
   const handleFileUpload = async (file: File | null) => {
-    if (!file) return;
+    if (!file) {
+      setUploadedFile(null);
+      return;
+    }
 
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
@@ -2744,12 +2813,12 @@ const EnhancedATSResumeBuilder = () => {
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setDragOver(true);
+    setDragOver(false);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setDragOver(false);
+    setDragOver(true);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -2763,7 +2832,7 @@ const EnhancedATSResumeBuilder = () => {
   };
 
   // Logout Button
-  const handleLogout = async () => {
+  const out = async () => {
     try {
       // Clear any user session data (e.g., from localStorage)
       localStorage.clear();
@@ -2843,7 +2912,7 @@ const renderSectionContent = () => {
                     resumeData={resumeData}
                     targetRole={targetRole}
                     industryFocus={industryFocus}
-                    lastSaved={lastSaved}
+                    lastSaved={lastSaved ?? null}
                     setShowPreview={setShowPreview}
                     setShowLoadDialog={setShowLoadDialog}
                     setShowSaveDialog={setShowSaveDialog}
@@ -2872,7 +2941,7 @@ const renderSectionContent = () => {
                     handleDrop={handleDrop}
                     fileInputRef={fileInputRef}
                     handleFileUpload={handleFileUpload}
-                    uploadedFile={uploadedFile}
+                    uploadedFile={uploadedFile ?? null}
                 />;
       case 'summary':
         return <SummarySection
@@ -2917,7 +2986,6 @@ const renderSectionContent = () => {
                     updateResumeData={updateResumeData}
                     handleAddProject={handleAddProject}
                     userData={userData}
-                    isPremium={isPremium}
                 />;
       default:
         return <OverviewSection
@@ -2926,7 +2994,7 @@ const renderSectionContent = () => {
                     resumeData={resumeData}
                     targetRole={targetRole}
                     industryFocus={industryFocus}
-                    lastSaved={lastSaved}
+                    lastSaved={lastSaved ?? null}
                     setShowPreview={setShowPreview}
                     setShowLoadDialog={setShowLoadDialog}
                     setShowSaveDialog={setShowSaveDialog}
@@ -2937,18 +3005,17 @@ const renderSectionContent = () => {
                     handleDrop={handleDrop}
                     fileInputRef={fileInputRef}
                     handleFileUpload={handleFileUpload}
-                    uploadedFile={uploadedFile}
+                    uploadedFile={uploadedFile ?? null}
                     setUploadedFile={setUploadedFile}
                     userData={userData}
-                    isPremium={isPremium}
                 />;
     }
   };
 
 return (
   <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white relative">
-    {/* Navigation */}
-    <Navigation />
+    {/* Unified Navigation */}
+    <UnifiedNavigation />
 
     {/* Background Logo - Large and Faded */}
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -2956,129 +3023,6 @@ return (
         <img src="/horse-logo.png" alt="" className="w-full h-full object-contain" />
       </div>
     </div>
-
-    {/* Header */}
-    <header className="bg-gray-900/90 backdrop-blur-md border-b border-gray-800 sticky top-16 z-40">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-3 cursor-pointer">
-              <div className="relative w-12 h-12">
-                <img src="/horse-logo.png" alt="SmartATS Logo" className="w-full h-full object-contain" />
-              </div>
-              <span className="text-2xl font-bold">SmartATS</span>
-            </Link>
-
-            {/* Resume Name & Save Status */}
-            <div className="hidden md:flex items-center gap-4">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-white">
-                  {resumeName || resumeData.personal.fullName || 'Untitled Resume'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-teal-600 to-amber-600 transition-all duration-500"
-                        style={{ width: `${calculateCompletion()}%` }}
-                      />
-                    </div>
-                    <span className="text-sm text-gray-400">{calculateCompletion()}%</span>
-                  </div>
-
-                  {/* Save Status Indicator */}
-                  <div className="flex items-center gap-1">
-                    {saveStatus === 'saving' && (
-                      <>
-                        <Loader className="w-3 h-3 animate-spin text-amber-400" />
-                        <span className="text-xs text-amber-400">Saving...</span>
-                      </>
-                    )}
-                    {saveStatus === 'saved' && (
-                      <>
-                        <CheckCircle className="w-3 h-3 text-green-400" />
-                        <span className="text-xs text-green-400">Saved</span>
-                      </>
-                    )}
-                    {saveStatus === 'unsaved' && (
-                      <>
-                        <AlertCircle className="w-3 h-3 text-orange-400" />
-                        <span className="text-xs text-orange-400">Unsaved</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Save Button */}
-            {userData?.isPremium ? (
-              <button
-                onClick={() => setShowSaveDialog(true)}
-                disabled={saveStatus === 'saving'}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 rounded-lg font-medium transition-colors flex items-center gap-2 text-white cursor-pointer"
-              >
-                {saveStatus === 'saving' ? (
-                  <Loader className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">
-                  {saveStatus === 'saving' ? 'Saving...' : 'Save'}
-                </span>
-              </button>
-            ) : (
-              <Link href="/pricing">
-                <button className="px-4 py-2 bg-gradient-to-r from-pink-600 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer relative overflow-hidden group">
-                  <Lock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Save</span>
-                  <Crown className="w-4 h-4" />
-                  <span className="absolute inset-0 bg-pink-700 opacity-0 group-hover:opacity-20 transition-opacity"></span>
-                </button>
-              </Link>
-            )}
-
-            {/* Load Button */}
-            <button
-              onClick={() => setShowLoadDialog(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors flex items-center gap-2 text-white cursor-pointer"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Load</span>
-            </button>
-
-            {/* Preview Button */}
-            <button
-              onClick={() => setShowPreview(true)}
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors flex items-center gap-2 cursor-pointer"
-            >
-              <Eye className="w-4 h-4" />
-              <span className="hidden sm:inline">Preview</span>
-            </button>
-
-            {/* Download PDF Button */}
-            <button
-              onClick={handleDownloadPdf}
-              className="px-4 py-2 bg-gradient-to-r from-teal-600 to-amber-600 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">PDF</span>
-            </button>
-            
-            {/* Logout Button */}
-            <button
-                onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-white hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer"
-                title="Logout"
-            >
-                <LogOut className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
 
     {/* Main Content Area */}
     <div className="flex">
@@ -3242,7 +3186,7 @@ return (
       </div>
 
       <div className="flex-1">
-        <SectionNav currentSection={currentSection} setCurrentSection={handleSectionChange} isPremium={isPremium} />
+        <SectionNav currentSection={currentSection} setCurrentSection={handleSectionChange} userData={userData} />
 
         <div className="max-w-6xl mx-auto p-6" key={currentSection}>
           {renderSectionContent()}
@@ -3545,12 +3489,13 @@ return (
           </div>
         </div>
       )}
-      {/* Debug Component - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <OAuthDebug />
-      )}
     </div>
   );
 };
 
 export default EnhancedATSResumeBuilder;
+
+function setIsAnalyzing(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+

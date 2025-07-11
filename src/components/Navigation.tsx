@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   FileText, Menu, X, LogOut, User, Crown, 
   ChevronDown, Building, Target
@@ -21,11 +21,15 @@ interface UserData {
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const supabase = createClientComponentClient();
+
+  // Check if we're on the builder page
+  const isBuilderPage = pathname === '/builder';
 
   useEffect(() => {
     checkUserStatus();
@@ -166,9 +170,25 @@ export default function Navigation() {
                   )}
                 </div>
 
-                <Link href="/builder" className="bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200">
-                  Build Resume
-                </Link>
+                {/* Conditionally show Build Resume button or prominent user name */}
+                {isBuilderPage ? (
+                  <div className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-teal-600/20 to-amber-600/20 border border-teal-500/30 rounded-xl">
+                    <User className="w-5 h-5 text-teal-400" />
+                    <span className="text-lg font-semibold text-white">
+                      {userData.fullName || userData.email.split('@')[0]}
+                    </span>
+                    {userData.isPremium && (
+                      <Crown className="w-5 h-5 text-amber-400" />
+                    )}
+                    {userData.isEnterprise && (
+                      <Building className="w-5 h-5 text-purple-400" />
+                    )}
+                  </div>
+                ) : (
+                  <Link href="/builder" className="bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+                    Build Resume
+                  </Link>
+                )}
               </div>
             ) : (
               <Link href="/login" className="bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200">
@@ -210,9 +230,11 @@ export default function Navigation() {
                     Signed in as {userData.email}
                     {userData.isPremium && <Crown className="w-4 h-4 text-amber-400 inline ml-2" />}
                   </div>
-                  <Link href="/builder" className="block w-full bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-3 rounded-xl font-medium text-center">
-                    Build Resume
-                  </Link>
+                  {!isBuilderPage && (
+                    <Link href="/builder" className="block w-full bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-3 rounded-xl font-medium text-center">
+                      Build Resume
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-900/20 text-red-400 rounded-xl font-medium"

@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
-import { 
-  Check, X, ArrowRight, Sparkles, Crown, Zap, Shield, 
-  FileText, Award, Users, Star, DollarSign, Building
+import {
+  Check, X, ArrowRight, Crown,
+  FileText, Building
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -152,18 +152,9 @@ Best regards,
   }
 };
 
-// Alternative Option: Create a dedicated Enterprise contact form component
-export const EnterpriseContactForm = () => {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    contactName: '',
-    email: '',
-    teamSize: '',
-    message: ''
-  });
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -172,12 +163,21 @@ export const EnterpriseContactForm = () => {
       const response = await fetch('/api/enterprise-inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(contactData)
       });
 
       if (response.ok) {
         toast.success('Thank you! Our enterprise team will contact you within 24 hours.');
-        // Reset form or redirect
+        setShowContactModal(false);
+        // Reset form
+        setContactData({
+          companyName: '',
+          fullName: '',
+          email: '',
+          phone: '',
+          employees: '',
+          message: ''
+        });
       } else {
         throw new Error('Failed to submit');
       }
@@ -189,65 +189,19 @@ export const EnterpriseContactForm = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full">
-        <h3 className="text-xl font-bold text-white mb-4">Enterprise Inquiry</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Company Name"
-            value={formData.companyName}
-            onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={formData.contactName}
-            onChange={(e) => setFormData({...formData, contactName: e.target.value})}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Work Email"
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-            required
-          />
-          <select
-            value={formData.teamSize}
-            onChange={(e) => setFormData({...formData, teamSize: e.target.value})}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-            required
-          >
-            <option value="">Select Team Size</option>
-            <option value="10-50">10-50 users</option>
-            <option value="51-100">51-100 users</option>
-            <option value="101-500">101-500 users</option>
-            <option value="500+">500+ users</option>
-          </select>
-          <textarea
-            placeholder="Tell us about your needs..."
-            value={formData.message}
-            onChange={(e) => setFormData({...formData, message: e.target.value})}
-            rows={4}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Sending...' : 'Submit Inquiry'}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <Navigation />
+
+      <div className="container mx-auto px-4 py-16">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Choose Your Plan
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Get the perfect plan for your career goals. Start free and upgrade when you're ready.
+          </p>
+        </div>
 
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -292,6 +246,7 @@ export const EnterpriseContactForm = () => {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => handlePlanSelect(tier.name)}
                   disabled={loading && selectedPlan === tier.name}
                   className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 mb-8 ${
@@ -335,11 +290,12 @@ export const EnterpriseContactForm = () => {
             Our Enterprise plan includes volume discounts, custom integrations, and dedicated support for teams of 10+
           </p>
           <button
+           type="button"
            onClick={() => {
              const subject = encodeURIComponent('SmartATS Enterprise Plan Inquiry');
              window.location.href = `mailto:enterprise@smartats.com?subject=${subject}`;
            }}
-           
+           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
             Learn More About Enterprise
             <ArrowRight className="w-5 h-5" />
           </button>
@@ -385,6 +341,7 @@ export const EnterpriseContactForm = () => {
             <div className="flex items-center justify-between p-6 border-b border-gray-800">
               <h3 className="text-2xl font-bold text-white">Contact Enterprise Sales</h3>
               <button
+                type="button"
                 onClick={() => setShowContactModal(false)}
                 className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
               >
@@ -459,6 +416,7 @@ export const EnterpriseContactForm = () => {
                   value={contactData.employees}
                   onChange={(e) => setContactData({ ...contactData, employees: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-amber-500 transition-colors"
+                  aria-label="Number of Employees"
                 >
                   <option value="">Select team size</option>
                   <option value="10-49">10-49</option>

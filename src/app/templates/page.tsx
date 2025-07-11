@@ -8,9 +8,9 @@ import {
   BarChart, Target, Eye, Briefcase, Code, Heart, GraduationCap,
   Building, Palette, DollarSign, Globe, Microscope, Crown
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { usePremiumStatus } from '@/hooks/usePremiumStatus';
+import   UnifiedNavigation from '@/components/UnifiedNavigation';
 
 // Premium Upgrade Banner Component
 const PremiumUpgradeBanner = () => (
@@ -35,15 +35,15 @@ const PremiumUpgradeBanner = () => (
           Get Premium Access - Only $19.99/month
         </button>
       </Link>
-      <p className="text-xs mt-3 text-pink-200">✨ 7-day free trial • Cancel anytime</p>
+      <p className="text-xs mt-3 text-pink-200">✨  Cancel anytime</p>
     </div>
   </div>
 );
 
 const EnhancedTemplatesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showPreview, setShowPreview] = useState(null);
-  const [hoveredTemplate, setHoveredTemplate] = useState(null);
+  const [showPreview, setShowPreview] = useState<TemplateType | null>(null);
+  const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
 
   // Use the premium status hook
   const { isPremium, loading: premiumLoading, error: premiumError, refreshStatus } = usePremiumStatus();
@@ -96,7 +96,7 @@ const EnhancedTemplatesPage = () => {
     if (urlParams.get('upgraded') === 'true') {
       // Clear any cached data and refresh user status
       setTimeout(() => {
-        checkUserStatus();
+        checkUserData();
       }, 1000);
     }
   }, []);
@@ -664,7 +664,12 @@ const EnhancedTemplatesPage = () => {
     ? templates 
     : templates.filter(t => t.category === selectedCategory);
 
-  const TemplatePreviewModal = ({ template, onClose }) => {
+  type TemplateType = typeof templates[number];
+  interface TemplatePreviewModalProps {
+    template: TemplateType | null;
+    onClose: () => void;
+  }
+  const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ template, onClose }) => {
     if (!template) return null;
 
     return (
@@ -779,7 +784,7 @@ const EnhancedTemplatesPage = () => {
 
   // Replace the ResumePreview component in your templates page with this enhanced version
 
-const EnhancedResumePreview = ({ template }) => {
+const EnhancedResumePreview: React.FC<{ template: TemplateType }> = ({ template }) => {
   const baseStyles = "h-full text-xs leading-tight overflow-hidden";
   
   // Modern Professional Template
@@ -799,7 +804,7 @@ const EnhancedResumePreview = ({ template }) => {
         
         <div className="mb-3">
           <div className="font-semibold text-blue-800 text-[10px] uppercase tracking-wide mb-1 border-b border-blue-200">Experience</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-2">
               <div className="font-medium text-[10px] text-blue-900">{exp.title}</div>
               <div className="text-gray-600 text-[10px]">{exp.company} • {exp.years}</div>
@@ -810,7 +815,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="font-semibold text-blue-800 text-[10px] uppercase tracking-wide mb-1 border-b border-blue-200">Skills</div>
           <div className="grid grid-cols-2 gap-1">
-            {template.preview.skills.slice(0, 6).map((skill, idx) => (
+            {template.preview.skills.slice(0, 6).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <div key={idx} className="text-[10px] text-gray-700">• {skill}</div>
             ))}
           </div>
@@ -836,7 +841,7 @@ const EnhancedResumePreview = ({ template }) => {
         
         <div className="mb-3">
           <div className="text-green-400 text-[10px] mb-1">~/experience</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="text-[10px] pl-2 mb-1">
               <div className="text-white">├── {exp.title}</div>
               <div className="text-gray-400">└── {exp.company} ({exp.years})</div>
@@ -847,9 +852,9 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="text-green-400 text-[10px] mb-1">~/skills</div>
           <div className="text-[10px] pl-2">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
-              <span key={idx} className="text-yellow-300">{skill}{idx < 3 ? ', ' : ''}</span>
-            ))}
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: number) => (
+                <span key={idx} className="text-yellow-300">{skill}{idx < 3 ? ', ' : ''}</span>
+              ))}
           </div>
         </div>
       </div>
@@ -873,7 +878,7 @@ const EnhancedResumePreview = ({ template }) => {
         
         <div className="mb-3">
           <div className="font-bold text-gray-800 text-[10px] tracking-wider mb-1">LEADERSHIP EXPERIENCE</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-2">
               <div className="font-semibold text-[10px]">{exp.title}</div>
               <div className="text-gray-600 text-[10px] italic">{exp.company} | {exp.years}</div>
@@ -884,7 +889,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="font-bold text-gray-800 text-[10px] tracking-wider mb-1">CORE COMPETENCIES</div>
           <div className="grid grid-cols-2 gap-0.5">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <div key={idx} className="text-[10px] text-gray-700">▪ {skill}</div>
             ))}
           </div>
@@ -917,7 +922,7 @@ const EnhancedResumePreview = ({ template }) => {
         
         <div className="mb-3">
           <div className="font-semibold text-purple-700 text-[10px] mb-1">EXPERIENCE</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-1.5">
               <div className="font-medium text-[10px] text-purple-800">{exp.title}</div>
               <div className="text-pink-600 text-[10px]">{exp.company}</div>
@@ -928,7 +933,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="font-semibold text-purple-700 text-[10px] mb-1">SKILLS</div>
           <div className="flex flex-wrap gap-1">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">
                 {skill}
               </span>
@@ -956,7 +961,7 @@ const EnhancedResumePreview = ({ template }) => {
           </div>
           <div className="col-span-2">
             <div className="font-semibold text-teal-700 text-[10px] mb-1">TECH STACK</div>
-            {template.preview.skills.slice(0, 3).map((skill, idx) => (
+            {template.preview.skills.slice(0, 3).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <div key={idx} className="text-[10px] text-gray-600">▶ {skill}</div>
             ))}
           </div>
@@ -967,7 +972,7 @@ const EnhancedResumePreview = ({ template }) => {
             <span className="w-2 h-2 bg-teal-500 rounded-full mr-1"></span>
             EXPERIENCE
           </div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-1.5 ml-3">
               <div className="font-medium text-[10px] text-teal-800">{exp.title}</div>
               <div className="text-gray-600 text-[10px]">{exp.company} | {exp.years}</div>
@@ -978,7 +983,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div className="bg-teal-50 p-2 rounded">
           <div className="font-semibold text-teal-700 text-[10px] mb-1">KEY TECHNOLOGIES</div>
           <div className="flex flex-wrap gap-1">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <span key={idx} className="text-[10px] px-1 py-0.5 bg-teal-100 text-teal-700 rounded">
                 {skill}
               </span>
@@ -1007,7 +1012,7 @@ const EnhancedResumePreview = ({ template }) => {
         
         <div className="mb-3">
           <div className="font-semibold text-blue-800 text-[10px] mb-1 bg-blue-50 p-1 rounded">CLINICAL EXPERIENCE</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-1.5 border-l-2 border-blue-200 pl-2">
               <div className="font-medium text-[10px] text-blue-900">{exp.title}</div>
               <div className="text-gray-600 text-[10px]">{exp.company} • {exp.years}</div>
@@ -1018,7 +1023,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="font-semibold text-blue-800 text-[10px] mb-1 bg-blue-50 p-1 rounded">CORE COMPETENCIES</div>
           <div className="grid grid-cols-2 gap-1">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <div key={idx} className="text-[10px] text-gray-700 flex items-center">
                 <span className="w-1 h-1 bg-blue-500 rounded-full mr-1"></span>
                 {skill}
@@ -1053,7 +1058,7 @@ const EnhancedResumePreview = ({ template }) => {
             <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
             CLINICAL EXPERIENCE
           </div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: any, idx: number) => (
             <div key={idx} className="mb-2 ml-3">
               <div className="font-medium text-[10px] text-blue-800">{exp.title}</div>
               <div className="text-blue-600 text-[10px]">{exp.company} • {exp.years}</div>
@@ -1067,7 +1072,7 @@ const EnhancedResumePreview = ({ template }) => {
             CORE COMPETENCIES
           </div>
           <div className="grid grid-cols-2 gap-1">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <div key={idx} className="text-[10px] text-gray-700">+ {skill}</div>
             ))}
           </div>
@@ -1094,7 +1099,7 @@ const EnhancedResumePreview = ({ template }) => {
 
         <div className="mb-3">
           <div className="font-bold text-green-700 text-[10px] mb-1">💼 EXPERIENCE</div>
-          {template.preview.experience.slice(0, 2).map((exp, idx) => (
+          {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
             <div key={idx} className="mb-2">
               <div className="font-medium text-[10px] text-green-800">{exp.title}</div>
               <div className="text-green-600 text-[10px]">{exp.company} | {exp.years}</div>
@@ -1105,7 +1110,7 @@ const EnhancedResumePreview = ({ template }) => {
         <div>
           <div className="font-bold text-green-700 text-[10px] mb-1">⚡ KEY SKILLS</div>
           <div className="flex flex-wrap gap-1">
-            {template.preview.skills.slice(0, 4).map((skill, idx) => (
+            {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
               <span key={idx} className="text-[8px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full">
                 {skill}
               </span>
@@ -1136,7 +1141,7 @@ const EnhancedResumePreview = ({ template }) => {
       
       <div className="mb-3">
         <div className="font-semibold text-[10px] uppercase tracking-wide mb-1">Experience</div>
-        {template.preview.experience.slice(0, 2).map((exp, idx) => (
+        {template.preview.experience.slice(0, 2).map((exp: { title: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; company: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; years: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, idx: React.Key | null | undefined) => (
           <div key={idx} className="mb-1.5">
             <div className="font-medium text-[10px]">{exp.title}</div>
             <div className="text-gray-600 text-[10px]">{exp.company} • {exp.years}</div>
@@ -1147,7 +1152,7 @@ const EnhancedResumePreview = ({ template }) => {
       <div>
         <div className="font-semibold text-[10px] uppercase tracking-wide mb-1">Skills</div>
         <div className="flex flex-wrap gap-1">
-          {template.preview.skills.slice(0, 4).map((skill, idx) => (
+          {template.preview.skills.slice(0, 4).map((skill: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, idx: React.Key | null | undefined) => (
             <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-700">
               {skill}
             </span>
@@ -1162,8 +1167,17 @@ const EnhancedResumePreview = ({ template }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black relative">
-      {/* Navigation */}
-      <Navigation />
+      {/* UnifiedNavigation */}
+      < UnifiedNavigation />
+
+      {/* Premium Banner for Non-Premium Users - Top of Page */}
+      {!isPremium && (
+        <section className="py-6 px-6">
+          <div className="max-w-5xl mx-auto">
+            <PremiumUpgradeBanner />
+          </div>
+        </section>
+      )}
 
       {/* Background Logo - Large and Faded */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -1171,36 +1185,6 @@ const EnhancedResumePreview = ({ template }) => {
           <img src="/horse-logo.png" alt="" className="w-full h-full object-contain" />
         </div>
       </div>
-
-      {/* Header */}
-      <header className="bg-gray-900/90 backdrop-blur-md shadow-lg sticky top-16 z-20 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <a href="/" className="flex items-center gap-3">
-                <div className="relative w-12 h-12">
-                  <img src="/horse-logo.png" alt="SmartATS Logo" className="w-full h-full object-contain" />
-                </div>
-                <span className="text-2xl font-bold text-white">SmartATS</span>
-              </a>
-              
-              <nav className="hidden md:flex items-center gap-6">
-                <a href="/" className="text-gray-300 hover:text-white font-medium transition-colors">Home</a>
-                <a href="/templates" className="text-teal-400 font-medium">Templates</a>
-                <a href="/builder" className="text-gray-300 hover:text-white font-medium transition-colors">Builder</a>
-                <a href="/pricing" className="text-gray-300 hover:text-white font-medium transition-colors">Pricing</a>
-              </nav>
-            </div>
-
-            <button 
-              onClick={() => window.location.href = '/builder'}
-              className="bg-gradient-to-r from-teal-600 to-amber-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Start Building
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
@@ -1225,7 +1209,7 @@ const EnhancedResumePreview = ({ template }) => {
 
           <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-teal-400 mb-1">99%</div>
+              <div className="text-3xl font-bold text-teal-400 mb-1">98%</div>
               <div className="text-sm text-gray-500">ATS Pass Rate</div>
             </div>
             <div className="text-center">
@@ -1450,14 +1434,7 @@ const EnhancedResumePreview = ({ template }) => {
         </div>
       </section>
 
-      {/* Premium Banner for Non-Premium Users */}
-      {!isPremium && (
-        <section className="py-12 px-6">
-          <div className="max-w-5xl mx-auto">
-            <PremiumUpgradeBanner />
-          </div>
-        </section>
-      )}
+
 
       {/* CTA Section */}
       <section className="py-16 px-6 bg-gradient-to-br from-teal-900/20 to-amber-900/20">

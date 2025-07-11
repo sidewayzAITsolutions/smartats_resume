@@ -200,3 +200,5 @@ function useDebounce(func: Function, delay: number) {
     }, delay);
   };
 }
+
+export ResumeBuilder;

@@ -151,7 +151,7 @@ const EnhancedLandingPage = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-hidden relative">
         {/* Background Logo - Large and Faded */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-5">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] opacity-5">
             <img src="/horse-logo.png" alt="" className="w-full h-full object-contain" />
           </div>
         </div>
@@ -448,10 +448,10 @@ const EnhancedLandingPage = () => {
                     <th className="text-center p-6">
                       <div className="flex flex-col items-center gap-2">
                         <div className="bg-gradient-to-br from-teal-600 to-amber-600 p-2 rounded-lg">
-                          <FileText className="w-6 h-6 text-white" />
+                          <img src="/horse-logo.png" alt="SmartATS Logo" className="w-6 h-6 object-contain" />
                         </div>
                         <span className="text-white font-bold">SmartATS</span>
-                        <span className="text-green-400 text-sm">$9.99/mo</span>
+                        <span className="text-green-400 text-sm">$19.99/mo</span>
                       </div>
                     </th>
                     <th className="text-center p-6">

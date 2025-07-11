@@ -41,32 +41,6 @@ export default function LoginPage() {
     checkUser();
   }, [router, next, supabase]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError(error.message);
-        toast.error(error.message);
-      } else if (data.user) {
-        toast.success('Welcome back!');
-        router.push(next);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('An unexpected error occurred');
-      toast.error('Failed to sign in');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -106,7 +80,32 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={async (e: React.FormEvent) => {
+            e.preventDefault();
+            setError('');
+            setLoading(true);
+
+            try {
+              const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+              });
+
+              if (error) {
+                setError(error.message);
+                toast.error(error.message);
+              } else if (data.user) {
+                toast.success('Welcome back!');
+                router.push(next);
+              }
+            } catch (error) {
+              console.error('Login error:', error);
+              setError('An unexpected error occurred');
+              toast.error('Failed to sign in');
+            } finally {
+              setLoading(false);
+            }
+          }} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address
