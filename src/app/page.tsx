@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, CheckCircle, Zap, Shield, Star, Target, TrendingUp, BarChart2, X, Menu, Sparkles, Award, FileText, Clock, User } from 'lucide-react';
 import LogoSplashScreen from '@/components/LogoSplashScreen';
+import FloatingATSGuide from '@/components/FloatingATSGuide';
 
 type ATSDemoModalProps = {
   open: boolean;
@@ -169,7 +170,7 @@ const EnhancedLandingPage = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* Logo Container */}
-                <div className="relative w-12 h-12">
+                <div className="relative w-24 h-24">
                   <img src="/horse-logo.png" alt="SmartATS Logo" className="w-full h-full object-contain" />
                 </div>
                 <div>
@@ -184,7 +185,6 @@ const EnhancedLandingPage = () => {
               <div className="hidden md:flex items-center gap-8">
                 <a href="/templates" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Templates</a>
                 <a href="/pricing" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Pricing</a>
-                <a href="/ats-guide" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">ATS Guide</a>
                 <button
                   type="button"
                   onClick={() => navigateTo('/login')}
@@ -209,7 +209,6 @@ const EnhancedLandingPage = () => {
               <div className="md:hidden absolute top-full left-0 right-0 bg-gray-900 shadow-lg border-t border-gray-800 p-6 space-y-4">
                 <a href="/templates" className="block text-gray-300 hover:text-teal-400 font-medium">Templates</a>
                 <a href="/pricing" className="block text-gray-300 hover:text-teal-400 font-medium">Pricing</a>
-                <a href="/ats-guide" className="block text-gray-300 hover:text-teal-400 font-medium">ATS Guide</a>
                 <button
                   type="button"
                   onClick={() => navigateTo('/login')}
@@ -448,7 +447,7 @@ const EnhancedLandingPage = () => {
                     <th className="text-center p-6">
                       <div className="flex flex-col items-center gap-2">
                         <div className="bg-gradient-to-br from-teal-600 to-amber-600 p-2 rounded-lg">
-                          <img src="/horse-logo.png" alt="SmartATS Logo" className="w-6 h-6 object-contain" />
+                          <img src="/horse-logo.png" alt="SmartATS Logo" className="w-10 h-10 object-contain" />
                         </div>
                         <span className="text-white font-bold">SmartATS</span>
                         <span className="text-green-400 text-sm">$19.99/mo</span>
@@ -861,6 +860,9 @@ const EnhancedLandingPage = () => {
 
         {/* Demo Modal */}
         <ATSDemoModal open={showDemoModal} onClose={() => setShowDemoModal(false)} />
+
+        {/* Floating ATS Guide Widget */}
+        <FloatingATSGuide />
 
         <style>{`
           @keyframes float {

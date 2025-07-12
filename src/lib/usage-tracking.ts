@@ -26,6 +26,15 @@ export const USAGE_LIMITS = {
   }
 };
 
+// Helper type and function to restrict actions to those with limits
+type LimitedUsageAction = Exclude<
+  UsageAction,
+  UsageAction.PREMIUM_FEATURE
+>;
+function isLimitedUsageAction(action: UsageAction): action is LimitedUsageAction {
+  return action in USAGE_LIMITS.free;
+}
+
 export class UsageTracker {
   private supabase: any;
   private userId: string | null = null;
@@ -75,7 +84,12 @@ export class UsageTracker {
         return true; // Premium users have unlimited access
       }
 
-      // Check daily limit for free users
+      // Only check limits for actions that have limits
+      if (!isLimitedUsageAction(action)) {
+        // If action is not limited, allow by default or handle as needed
+        return true;
+      }
+
       const limit = USAGE_LIMITS.free[action];
       if (limit === -1) return true; // Unlimited
 
@@ -121,6 +135,10 @@ export class UsageTracker {
     
     if (isPremium) {
       return null; // Unlimited for premium
+    }
+
+    if (!isLimitedUsageAction(action)) {
+      return null; // Unlimited or not tracked
     }
 
     const limit = USAGE_LIMITS.free[action];

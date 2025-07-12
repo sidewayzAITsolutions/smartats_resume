@@ -1,4 +1,13 @@
 // utils/ai.ts
+declare global {
+  interface Window {
+    claude?: {
+      complete?: (prompt: string) => Promise<string>;
+      // ...other properties if needed
+    };
+  }
+}
+
 interface AICompletionOptions {
   model?: string;
   temperature?: number;
@@ -195,8 +204,7 @@ export async function testAIConnection(): Promise<{ success: boolean; service: s
     
     return { 
       success: true, 
-      service,
-      message: result
+      service
     };
   } catch (error) {
     console.error('❌ AI test failed:', error);

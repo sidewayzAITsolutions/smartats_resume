@@ -1,8 +1,17 @@
 // src/components/ResumeBuilder/PersonalInfoForm.tsx
 'use client';
 import React, { useState } from 'react';
-import { PersonalInfo } from '@/types/resume';
 import { Button } from '@/components/ui/Button';
+
+// Define the PersonalInfo interface
+interface PersonalInfo {
+  fullName: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  linkedin?: string;
+  portfolio?: string;
+}
 
 interface PersonalInfoFormProps {
   initialData: PersonalInfo;

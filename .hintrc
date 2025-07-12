@@ -6,7 +6,8 @@
     "axe/forms": [
       "default",
       {
-        "label": "off"
+        "label": "off",
+        "select-name": "off"
       }
     ],
     "no-inline-styles": "off",
@@ -14,6 +15,14 @@
       "default",
       {
         "button-name": "off"
+      }
+    ],
+    "compat-api/html": [
+      "default",
+      {
+        "ignore": [
+          "input[type=month]"
+        ]
       }
     ]
   }

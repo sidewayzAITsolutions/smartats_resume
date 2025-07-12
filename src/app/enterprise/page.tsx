@@ -7,7 +7,7 @@ import {
   FileText, HeadphonesIcon, CheckCircle2, ArrowRight, 
   Clock, TrendingUp, Star, ChevronRight
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
+import UnifiedNavigation from '@/components/UnifiedNavigation';
 
 const EnterprisePage = () => {
   const router = useRouter();
@@ -105,7 +105,7 @@ const EnterprisePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
-      <Navigation />
+      <UnifiedNavigation />
       
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-6 overflow-hidden">

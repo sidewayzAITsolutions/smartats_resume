@@ -2,14 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import Navigation from '@/components/Navigation';
+import UnifiedNavigation from '@/components/UnifiedNavigation';
 import { 
   Building, Users, Target, Shield, Zap, BarChart3, Award, 
   FileText, Clock, Phone, Code, CheckCircle, TrendingUp,
   Star, Sparkles, ArrowRight, Globe, Lock, Palette,
   BarChart2, Settings, Brain, RefreshCw, Database,
   MessageSquare, Calendar, CreditCard, Plus, Edit,
-  Trash2, Download, Upload, Search, Filter, Eye
+  Trash2, Download, Upload, Search, Filter, Eye,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -153,7 +154,7 @@ const EnterpriseDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
-      <Navigation />
+      <UnifiedNavigation />
 
       {/* Dashboard Header */}
       <div className="pt-24 pb-8 px-6 bg-gradient-to-br from-amber-900/20 to-orange-900/20 border-b border-amber-700/30">

@@ -1,6 +1,6 @@
 // components/ResumeBuilder.tsx
-import { useEffect, useState } from 'react';
-import { useSupabase } from '@/hooks/useSupabase';
+import { useEffect, useState, useRef } from 'react';
+import { useSupabase } from '../../hooks/useSupabase';
 import { useUsageTracking, UsageAction } from '@/lib/usage-tracking';
 import { toast } from 'react-hot-toast';
 
@@ -9,6 +9,9 @@ export function ResumeBuilder() {
   const usageTracking = useUsageTracking(supabase);
   const [isSaving, setIsSaving] = useState(false);
   const [sessionInterval, setSessionInterval] = useState<NodeJS.Timeout | null>(null);
+
+  // Add resumeData state
+  const [resumeData, setResumeData] = useState<any>({});
 
   // Initialize usage tracking and session management
   useEffect(() => {
@@ -173,7 +176,11 @@ export function ResumeBuilder() {
       </div>
 
       {/* Your existing resume builder UI */}
-      
+      {/* 
+        Add your resume editing UI here, and update setResumeData as needed, e.g.:
+        <ResumeEditor value={resumeData} onChange={setResumeData} />
+      */}
+
       {/* Save button with loading state */}
       <button
         onClick={() => handleSave(resumeData)}
@@ -201,4 +208,13 @@ function useDebounce(func: Function, delay: number) {
   };
 }
 
-export ResumeBuilder;
+export default ResumeBuilder;
+
+function showUpgradeModal() {
+  // TODO: Replace with actual modal logic
+  alert('Upgrade to Premium to unlock unlimited saves and scans!');
+}
+function calculateATSScore() {
+  throw new Error('Function not implemented.');
+}
+

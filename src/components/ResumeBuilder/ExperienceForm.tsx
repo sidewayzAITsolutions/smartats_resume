@@ -238,12 +238,50 @@ function createEmptyExperience(): Experience {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Calendar className="h-5 w-5 text-gray-400" />
                   </div>
-                  <input
-                    type="month"
-                    value={experience.startDate}
-                    onChange={(e) => updateExperience(expIndex, 'startDate', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sleek-input"
-                  />
+                  <div className="flex gap-2 pl-10">
+                    <select
+                      value={experience.startDate ? experience.startDate.split('-')[1] : ''}
+                      onChange={(e) => {
+                        const year = experience.startDate ? experience.startDate.split('-')[0] : new Date().getFullYear().toString();
+                        const month = e.target.value;
+                        updateExperience(expIndex, 'startDate', month ? `${year}-${month}` : '');
+                      }}
+                      className="flex-1 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sleek-input"
+                    >
+                      <option value="">Month</option>
+                      <option value="01">January</option>
+                      <option value="02">February</option>
+                      <option value="03">March</option>
+                      <option value="04">April</option>
+                      <option value="05">May</option>
+                      <option value="06">June</option>
+                      <option value="07">July</option>
+                      <option value="08">August</option>
+                      <option value="09">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                    <select
+                      value={experience.startDate ? experience.startDate.split('-')[0] : ''}
+                      onChange={(e) => {
+                        const month = experience.startDate ? experience.startDate.split('-')[1] : '';
+                        const year = e.target.value;
+                        updateExperience(expIndex, 'startDate', year && month ? `${year}-${month}` : '');
+                      }}
+                      className="flex-1 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sleek-input"
+                    >
+                      <option value="">Year</option>
+                      {Array.from({ length: 50 }, (_, i) => {
+                        const year = new Date().getFullYear() - i;
+                        return (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -257,13 +295,52 @@ function createEmptyExperience(): Experience {
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="h-5 w-5 text-gray-400" />
                     </div>
-                    <input
-                      type="month"
-                      value={experience.endDate || ''}
-                      onChange={(e) => updateExperience(expIndex, 'endDate', e.target.value)}
-                      disabled={experience.current}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 sleek-input"
-                    />
+                    <div className="flex gap-2 pl-10">
+                      <select
+                        value={experience.endDate ? experience.endDate.split('-')[1] : ''}
+                        onChange={(e) => {
+                          const year = experience.endDate ? experience.endDate.split('-')[0] : new Date().getFullYear().toString();
+                          const month = e.target.value;
+                          updateExperience(expIndex, 'endDate', month ? `${year}-${month}` : '');
+                        }}
+                        disabled={experience.current}
+                        className="flex-1 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 sleek-input"
+                      >
+                        <option value="">Month</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                      <select
+                        value={experience.endDate ? experience.endDate.split('-')[0] : ''}
+                        onChange={(e) => {
+                          const month = experience.endDate ? experience.endDate.split('-')[1] : '';
+                          const year = e.target.value;
+                          updateExperience(expIndex, 'endDate', year && month ? `${year}-${month}` : '');
+                        }}
+                        disabled={experience.current}
+                        className="flex-1 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 sleek-input"
+                      >
+                        <option value="">Year</option>
+                        {Array.from({ length: 50 }, (_, i) => {
+                          const year = new Date().getFullYear() - i;
+                          return (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
                   </div>
                   <label className="flex items-center text-sm text-gray-600">
                     <input

@@ -5,10 +5,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  
-  // middleware.ts - Update protected routes
-  const protectedRoutes = ['/builder', '/profile', '/settings', '/dashboard'];
-  
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
@@ -17,7 +13,7 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes that require authentication
-  const protectedRoutes = ['/profile', '/settings'];
+  const protectedRoutes = ['/builder', '/profile', '/settings', '/dashboard'];
   const authRoutes = ['/login', '/signup'];
   const pathname = req.nextUrl.pathname;
 

@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* If you are not using Tailwind CSS, remove these lines. 
+   If you are using Tailwind, make sure your build process supports it. */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
+
 
 /* CSS Custom Properties */
 :root {

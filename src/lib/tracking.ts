@@ -1,4 +1,13 @@
 // lib/tracking.ts
+declare global {
+  interface Window {
+    mixpanel?: {
+      track: (eventName: string, properties?: Record<string, string | number | boolean | null>) => void;
+    };
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 export const trackEvent = (eventName: string, properties?: Record<string, string | number | boolean | null>) => {
   // Google Analytics
   if (typeof window !== 'undefined' && window.gtag) {

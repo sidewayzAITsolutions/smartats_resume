@@ -1,7 +1,13 @@
 // components/FeatureCard.jsx
 import React from 'react';
 
-export const FeatureCard = ({ icon, title, description }) => {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+export const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   return (
     <div className="bg-[#F0F0F0] rounded-xl p-6 border border-[#D4A136]/30 hover:shadow-lg transition-all duration-300">
       <div className="w-12 h-12 bg-[#1A504B]/50 rounded-xl flex items-center justify-center mb-4">

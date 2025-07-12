@@ -1,7 +1,11 @@
 // components/OptimizedImage.tsx
-import Image from 'next/image';
+import Image, { ImageProps } from 'next/image';
 
-export function OptimizedImage({ src, alt, ...props }) {
+export function OptimizedImage({
+  src,
+  alt,
+  ...props
+}: Pick<ImageProps, 'src' | 'alt'> & Omit<ImageProps, 'src' | 'alt'>) {
   return (
     <Image
       src={src}

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { refreshUserPremiumStatus } from '@/lib/my-utils';
 
-const PaymentSuccessPage = () => {
+const PaymentSuccessContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
@@ -39,7 +40,7 @@ const PaymentSuccessPage = () => {
         }
 
         // Clear any cached data to ensure fresh state
-        await supabase.auth.refreshSession();
+        await refreshUserPremiumStatus();
 
         // Show success message
         toast.success('Welcome to SmartATS Premium! 🎉');
@@ -53,7 +54,7 @@ const PaymentSuccessPage = () => {
     };
 
     updatePremiumStatus();
-  }, [supabase]);
+  }, []);
 
   if (loading) {
     return (
@@ -110,18 +111,18 @@ const PaymentSuccessPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              '✨ AI-Powered Summary Generation',
-              '📊 Unlimited ATS Scans',
-              '💾 Unlimited Resume Saves',
-              '🎨 Premium Templates',
-              '🔍 Advanced Keyword Analysis',
-              '📧 Priority Email Support',
-              '📈 Detailed Analytics',
-              '🚀 Early Access to New Features'
+              { emoji: '✨', text: 'AI-Powered Summary Generation' },
+              { emoji: '📊', text: 'Unlimited ATS Scans' },
+              { emoji: '💾', text: 'Unlimited Resume Saves' },
+              { emoji: '🎨', text: 'Premium Templates' },
+              { emoji: '🔍', text: 'Advanced Keyword Analysis' },
+              { emoji: '📧', text: 'Priority Email Support' },
+              { emoji: '📈', text: 'Detailed Analytics' },
+              { emoji: '🚀', text: 'Early Access to New Features' }
             ].map((feature, index) => (
               <div key={index} className="flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                <span className="text-gray-300">{feature.substring(2)}</span>
+                <span className="text-xl">{feature.emoji}</span>
+                <span className="text-gray-300">{feature.text}</span>
               </div>
             ))}
           </div>
@@ -163,26 +164,20 @@ const PaymentSuccessPage = () => {
   );
 };
 
-export default PaymentSuccessPage;
-
-// Helper function to force refresh user data across the app
-export const refreshUserPremiumStatus = async (supabase: any) => {
-  try {
-    // Refresh the session to get latest user data
-    const { data: { session }, error } = await supabase.auth.refreshSession();
-    
-    if (error) throw error;
-    
-    // Trigger a re-render by updating local storage
-    if (session) {
-      localStorage.setItem('premium_activated', new Date().toISOString());
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error refreshing premium status:', error);
-    return false;
-  }
+const PaymentSuccessPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
 };
 
-     
+export default PaymentSuccessPage;
+

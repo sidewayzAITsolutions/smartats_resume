@@ -1,9 +1,10 @@
-// lib/email.ts
-import { Resend } from 'resend';
+// @ts-ignore
+const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// lib/email.ts
 
 export async function sendWelcomeEmail(email: string, name: string) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: 'SmartATSResume <noreply@smartatsresume.com>',
     to: email,

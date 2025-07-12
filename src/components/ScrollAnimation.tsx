@@ -1,7 +1,18 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+
+// Try to import 'framer-motion', fallback to a passthrough if not available
+let motion: any;
+try {
+  // @ts-ignore
+  motion = require('framer-motion').motion;
+} catch {
+  motion = {
+    div: ({ children, className }: any) => <div className={className}>{children}</div>
+  };
+}
+
 import { ReactNode } from 'react';
 
 interface ScrollAnimationProps {

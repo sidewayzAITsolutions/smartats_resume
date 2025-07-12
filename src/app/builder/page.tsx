@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef, JSX } from 'react';
+import React, { useState, useEffect, useCallback, useRef, JSX, Suspense } from 'react';
 // Import for PDF generation
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -11,6 +11,7 @@ import DebugSectionNavigation from '@/components/OAuthDebug';
 import UnifiedNavigation from "@/components/UnifiedNavigation";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { ResumeBuilder } from "@/components/ResumeBuilder/ResumeBuilder"
+import toast from 'react-hot-toast';
 import {
   FileText, Star, Shield, Zap, Filter, CheckCircle, Lock,
   TrendingUp, Award, Users, Clock, ArrowRight, X, Sparkles,
@@ -19,10 +20,12 @@ import {
   Search, RefreshCw, Download, Save, Lightbulb, Loader,
   Plus, Crown, MapPin, ChevronRight, Rocket, AlertCircle,
   User, Menu, ChevronDown, Copy, Trash2, Move, Info,
-  MessageSquare, BookOpen, Settings, BarChart3, Home, Upload, LogOut
+  MessageSquare, BookOpen, Settings, BarChart3, Home, Upload, LogOut,
+  Mail, Phone, Linkedin, Github
 } from 'lucide-react';
 import OAuthDebug from '@/components/OAuthDebug';
-import Navigation from '@/components/Navigation';
+import FloatingATSGuide from '@/components/FloatingATSGuide';
+
 
 // DRY: Lock icon for non-premium sections
 const NonPremiumLockIcon = () => <Lock className="w-4 h-4 text-pink-400" />;
@@ -287,7 +290,7 @@ interface OverviewSectionProps {
   setShowPreview: (show: boolean) => void;
   setShowLoadDialog: (show: boolean) => void;
   setShowSaveDialog: (show: boolean) => void;
-  saveStatus: string;
+  saveStatus: 'saved' | 'saving' | 'unsaved';
   dragOver: boolean;
   handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void; 
   handleDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;  
@@ -326,7 +329,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-3xl font-bold text-white mb-2">
-              Welcome to SmartATS Builder! 🚀
+              Welcome to Our SmartATS Builder! 🚀
             </h2>
             <p className="text-gray-300 text-lg mb-6">
               Let's create a resume that beats the ATS and lands you interviews.
@@ -371,7 +374,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
               <img
               src="/horse-logo.png"
               alt="SmartATS Logo"
-              className="w-16 h-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain"
+              className="w-24 h-24 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain"
               />
             </div>
           </div>
@@ -1882,7 +1885,7 @@ type ResumeSectionKey =
   | 'projects'
   | 'customSections';
 
-const EnhancedATSResumeBuilder = () => {
+const EnhancedATSResumeBuilderContent = () => {
   
   // State Management
   const [currentSection, setCurrentSection] = useState<SectionName>('overview');
@@ -2025,11 +2028,11 @@ const EnhancedATSResumeBuilder = () => {
   const [scoreIncreaseAmount, setScoreIncreaseAmount] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [saveStatus, setSaveStatus] = useState('saved'); // 'saving', 'saved', 'unsaved'
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
+  const [showSaveDialog, setShowSaveDialog] = useState(true);
   const [resumeName, setResumeName] = useState('');
   const [savedResumes, setSavedResumes] = useState<SavedResume[]>([]);
-  const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [showLoadDialog, setShowLoadDialog] = useState(true);
   const [lastSaved, setLastSaved] = useState<string>();
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const skillSearchRef = useRef<HTMLDivElement>(null);
@@ -2422,7 +2425,7 @@ const EnhancedATSResumeBuilder = () => {
 
   // Save/Load Functions
   const generateResumeId = () => {
-    return 'resume_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 'resume_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
   };
 
   const loadSavedResumes = () => {
@@ -2439,6 +2442,9 @@ const EnhancedATSResumeBuilder = () => {
   const saveResume = async (name: string, isAutoSave = false) => {
     if (!userData?.isPremium) {
       // Non-premium users can't save
+      if (!isAutoSave) {
+        toast.error('Premium subscription required to save resumes');
+      }
       return;
     }
 
@@ -2456,6 +2462,10 @@ const EnhancedATSResumeBuilder = () => {
         atsScore,
         scoreBreakdown
       };
+
+      // Validate resume data before saving
+      if (!resumeToSave.data.personal.fullName && !resumeToSave.data.personal.email) {
+        }
 
       // Get existing saved resumes
       const existingSaves = JSON.parse(localStorage.getItem('smartats_saved_resumes') || '[]');
@@ -2481,7 +2491,8 @@ const EnhancedATSResumeBuilder = () => {
       setSaveStatus('saved');
 
       if (!isAutoSave) {
-        // Show save confirmation
+        // Show save confirmation with toast
+        toast.success(`Resume "${resumeToSave.name}" saved successfully!`);
         setTimeout(() => {
           setSaveStatus('saved');
         }, 1000);
@@ -2491,6 +2502,12 @@ const EnhancedATSResumeBuilder = () => {
     } catch (error) {
       console.error('Failed to save resume:', error);
       setSaveStatus('unsaved');
+
+      if (!isAutoSave) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to save resume. Please try again.';
+        toast.error(errorMessage);
+      }
+
       throw error;
     }
   };
@@ -2518,23 +2535,54 @@ const EnhancedATSResumeBuilder = () => {
   }
 
   const loadResume = (resume: SavedResume) => {
-    setResumeData(resume.data);
-    setTargetRole(resume.targetRole || '');
-    setIndustryFocus(resume.industryFocus || '');
-    setResumeName(resume.name);
-    setLastSaved(resume.updatedAt);
-    setSaveStatus('saved');
-    setShowLoadDialog(false);
+    try {
+      // Validate resume data structure
+      if (!resume.data || typeof resume.data !== 'object') {
+        throw new Error('Invalid resume data format');
+      }
+
+      // Ensure required fields exist
+      if (!resume.data.personal) {
+        throw new Error('Resume data is missing personal information');
+      }
+
+      setResumeData(resume.data);
+      setTargetRole(resume.targetRole || '');
+      setIndustryFocus(resume.industryFocus || '');
+      setResumeName(resume.name);
+      setLastSaved(resume.updatedAt);
+      setSaveStatus('saved');
+      setShowLoadDialog(false);
+
+      // Show success message
+      toast.success(`Resume "${resume.name}" loaded successfully!`);
+
+      // Optionally switch to overview section to show loaded data
+      setCurrentSection('overview');
+
+    } catch (error) {
+      console.error('Failed to load resume:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load resume. The file may be corrupted.';
+      toast.error(errorMessage);
+    }
   };
 
   const deleteResume = (resumeId: string) => {
     try {
       const existingSaves = JSON.parse(localStorage.getItem('smartats_saved_resumes') || '[]');
+      const resumeToDelete = existingSaves.find((resume: SavedResume) => resume.id === resumeId);
       const filtered = existingSaves.filter((resume: SavedResume) => resume.id !== resumeId);
+
       localStorage.setItem('smartats_saved_resumes', JSON.stringify(filtered));
       setSavedResumes(filtered);
+
+      // Show success message
+      if (resumeToDelete) {
+        toast.success(`Resume "${resumeToDelete.name}" deleted successfully`);
+      }
     } catch (error) {
       console.error('Failed to delete resume:', error);
+      toast.error('Failed to delete resume. Please try again.');
     }
   };
 
@@ -2575,17 +2623,60 @@ const EnhancedATSResumeBuilder = () => {
             setTargetRole(importedData.targetRole || '');
             setIndustryFocus(importedData.industryFocus || '');
             setSaveStatus('unsaved');
-            alert('Resume imported successfully!');
+            toast.success('Resume imported successfully!');
           } else {
-            alert('Invalid resume file format.');
+            toast.error('Invalid resume file format.');
           }
         }
       } catch (error) {
         console.error('Import failed:', error);
-        alert('Failed to import resume. Please check the file format.');
+        toast.error('Failed to import resume. Please check the file format.');
       }
     };
     reader.readAsText(file);
+  };
+
+  // PDF Download function for navigation
+  const handlePDFDownload = async () => {
+    try {
+      if (resumePreviewRef.current) {
+        const canvas = await html2canvas(resumePreviewRef.current, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        const fileName = `${resumeData.personal.fullName || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(fileName);
+        toast.success('PDF downloaded successfully!');
+      } else {
+        // If preview is not available, show preview first
+        setShowPreview(true);
+        toast('Please wait for the preview to load, then try downloading again.', { icon: 'ℹ️' });
+      }
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    }
   };
 
   // AI Suggestion Functions
@@ -2818,7 +2909,7 @@ const EnhancedATSResumeBuilder = () => {
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setDragOver(true);
+    setDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -2831,76 +2922,6 @@ const EnhancedATSResumeBuilder = () => {
     }
   };
 
-  // Logout Button
-  const out = async () => {
-    try {
-      // Clear any user session data (e.g., from localStorage)
-      localStorage.clear();
-      sessionStorage.clear();
-
-      // If using Supabase, sign out
-      // const { error } = await supabase.auth.signOut();
-      // if (error) console.error('Error signing out:', error);
-
-      // Redirect to the home page
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during logout:', error);
-      // Still redirect even if there's an error
-      window.location.href = '/';
-    }
-  };
-
-  // Fixed PDF Download Function
-  const handleDownloadPdf = async () => {
-    const input = resumePreviewRef.current;
-    if (!input) {
-      alert('Preview element not found. Please try again.');
-      return;
-    }
-
-    try {
-      // Show the preview to ensure content is rendered
-      setShowPreview(true);
-      
-      // Wait for preview to render
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const canvas = await html2canvas(input, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        windowWidth: 1200,
-        windowHeight: 1600
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'pt',
-        format: 'a4',
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
-
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`${resumeName || resumeData.personal.fullName || 'resume'}.pdf`);
-      
-      // Hide preview after successful download
-      setShowPreview(false);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
-      setShowPreview(false);
-    }
-  };
 
 // Render functions
 const renderSectionContent = () => {
@@ -2923,8 +2944,8 @@ const renderSectionContent = () => {
                     handleDrop={handleDrop}
                     fileInputRef={fileInputRef}
                     handleFileUpload={handleFileUpload}
-                    uploadedFile={uploadedFile}
                     setUploadedFile={setUploadedFile}
+                    uploadedFile={uploadedFile}
                     userData={userData}
                 />;
       case 'personal':
@@ -2989,33 +3010,40 @@ const renderSectionContent = () => {
                 />;
       default:
         return <OverviewSection
-                    setCurrentSection={setCurrentSection}
-                    calculateCompletion={calculateCompletion}
-                    resumeData={resumeData}
-                    targetRole={targetRole}
-                    industryFocus={industryFocus}
-                    lastSaved={lastSaved ?? null}
-                    setShowPreview={setShowPreview}
-                    setShowLoadDialog={setShowLoadDialog}
-                    setShowSaveDialog={setShowSaveDialog}
-                    saveStatus={saveStatus}
-                    dragOver={dragOver}
-                    handleDragOver={handleDragOver}
-                    handleDragLeave={handleDragLeave}
-                    handleDrop={handleDrop}
-                    fileInputRef={fileInputRef}
-                    handleFileUpload={handleFileUpload}
-                    uploadedFile={uploadedFile ?? null}
-                    setUploadedFile={setUploadedFile}
-                    userData={userData}
-                />;
+          setCurrentSection={setCurrentSection}
+          calculateCompletion={calculateCompletion}
+          resumeData={resumeData}
+          targetRole={targetRole}
+          industryFocus={industryFocus}
+          lastSaved={lastSaved ?? null}
+          setShowPreview={setShowPreview}
+          setShowLoadDialog={setShowLoadDialog}
+          setShowSaveDialog={setShowSaveDialog}
+          saveStatus={saveStatus}
+          dragOver={dragOver}
+          handleDragOver={handleDragOver}
+          handleDragLeave={handleDragLeave}
+          handleDrop={handleDrop}
+          fileInputRef={fileInputRef}
+          handleFileUpload={handleFileUpload}
+          uploadedFile={uploadedFile}
+          userData={userData} setUploadedFile={function (file: File | null): void {
+            throw new Error('Function not implemented.');
+          } }                />;
     }
   };
 
 return (
   <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white relative">
     {/* Unified Navigation */}
-    <UnifiedNavigation />
+    <UnifiedNavigation
+      resumeName={resumeName || resumeData.personal.fullName || 'Untitled Resume'}
+      saveStatus={saveStatus}
+      onSave={() => setShowSaveDialog(true)}
+      onLoad={() => setShowLoadDialog(true)}
+      onPreview={() => setShowPreview(true)}
+      onExportPDF={handlePDFDownload}
+    />
 
     {/* Background Logo - Large and Faded */}
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -3200,29 +3228,115 @@ return (
           <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold text-gray-900">Resume Preview</h2>
-              <button
-                onClick={() => setShowPreview(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    // Trigger PDF download
+                    const downloadPDF = async () => {
+                      try {
+                        if (resumePreviewRef.current) {
+                          const canvas = await html2canvas(resumePreviewRef.current, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true
+                          });
+
+                          const imgData = canvas.toDataURL('image/png');
+                          const pdf = new jsPDF('p', 'mm', 'a4');
+                          const imgWidth = 210;
+                          const pageHeight = 295;
+                          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                          let heightLeft = imgHeight;
+
+                          let position = 0;
+
+                          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                          heightLeft -= pageHeight;
+
+                          while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                          }
+
+                          const fileName = `${resumeData.personal.fullName || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`;
+                          pdf.save(fileName);
+                          toast.success('PDF downloaded successfully!');
+                        }
+                      } catch (error) {
+                        console.error('PDF generation failed:', error);
+                        toast.error('Failed to generate PDF. Please try again.');
+                      }
+                    };
+                    downloadPDF();
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF
+                </button>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
             </div>
 
             <div className="p-8 overflow-y-auto max-h-[calc(90vh-100px)]">
               {/* Added ref to this div for PDF download */}
-              <div ref={resumePreviewRef} className="max-w-3xl mx-auto bg-white p-8">
+              <div ref={resumePreviewRef} className="max-w-3xl mx-auto bg-white p-8 font-inter">
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900">
+                  <h1 className="text-4xl font-bold text-gray-900 font-roboto tracking-tight">
                     {resumeData.personal.fullName || 'Your Name'}
                   </h1>
-                  <p className="text-lg text-gray-600 mt-1">
+                  <p className="text-xl text-gray-600 mt-2 font-medium">
                     {resumeData.personal.title || 'Professional Title'}
                   </p>
-                  <div className="flex items-center justify-center gap-4 text-sm text-gray-600 mt-3">
-                    {resumeData.personal.email && <span>{resumeData.personal.email}</span>}
-                    {resumeData.personal.phone && <span>{resumeData.personal.phone}</span>}
-                    {resumeData.personal.location && <span>{resumeData.personal.location}</span>}
+                  <div className="flex items-center justify-center gap-6 text-sm text-gray-600 mt-4 font-medium">
+                    {resumeData.personal.email && (
+                      <span className="flex items-center gap-1">
+                        <Mail className="w-4 h-4" />
+                        {resumeData.personal.email}
+                      </span>
+                    )}
+                    {resumeData.personal.phone && (
+                      <span className="flex items-center gap-1">
+                        <Phone className="w-4 h-4" />
+                        {resumeData.personal.phone}
+                      </span>
+                    )}
+                    {resumeData.personal.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {resumeData.personal.location}
+                      </span>
+                    )}
                   </div>
+                  {(resumeData.personal.linkedin || resumeData.personal.portfolio || resumeData.personal.github) && (
+                    <div className="flex items-center justify-center gap-6 text-sm text-blue-600 mt-3">
+                      {resumeData.personal.linkedin && (
+                        <span className="flex items-center gap-1">
+                          <Linkedin className="w-4 h-4" />
+                          LinkedIn
+                        </span>
+                      )}
+                      {resumeData.personal.portfolio && (
+                        <span className="flex items-center gap-1">
+                          <Globe className="w-4 h-4" />
+                          Portfolio
+                        </span>
+                      )}
+                      {resumeData.personal.github && (
+                        <span className="flex items-center gap-1">
+                          <Github className="w-4 h-4" />
+                          GitHub
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {resumeData.summary && (
@@ -3489,11 +3603,31 @@ return (
           </div>
         </div>
       )}
+
+      {/* Floating ATS Guide Widget */}
+      <FloatingATSGuide />
     </div>
   );
 };
 
+const EnhancedATSResumeBuilder = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto"></div>
+          <p className="mt-4 text-white text-lg">Loading Resume Builder...</p>
+        </div>
+      </div>
+    }>
+      <EnhancedATSResumeBuilderContent />
+    </Suspense>
+  );
+};
+
 export default EnhancedATSResumeBuilder;
+
+
 
 function setIsAnalyzing(arg0: boolean) {
   throw new Error('Function not implemented.');

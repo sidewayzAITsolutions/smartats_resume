@@ -1,9 +1,18 @@
 // src/components/ResumeBuilder/SkillsForm.tsx - Create this file
 'use client';
 import React, { useState } from 'react';
-import { Skill } from '@/types/resume';
 import { Plus, X, Code, Target, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+
+// Define Skill type locally (adjust fields as needed)
+type Skill = {
+  id: string;
+  name: string;
+  category: 'technical' | 'soft' | 'language';
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  proficiency: string;
+  keywords: string[];
+};
 
 interface SkillsFormProps {
   initialData: Skill[];

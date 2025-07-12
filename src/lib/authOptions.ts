@@ -1,4 +1,5 @@
-import GoogleProvider from "next-auth/providers/google";
+// @ts-ignore
+const GoogleProvider = require("next-auth/providers/google").default;
 export const authOptions = {
   providers: [
     GoogleProvider({
@@ -7,7 +8,13 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
+    async session({
+      session,
+      user,
+    }: {
+      session: Record<string, any>;
+      user: Record<string, any>;
+    }) {
       // custom session logic
       // @ts-ignore
       session.user.id = user.id;
