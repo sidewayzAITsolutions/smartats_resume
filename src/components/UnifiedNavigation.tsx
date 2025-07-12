@@ -33,7 +33,7 @@ const UnifiedNavigation = ({
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
   const supabase = createClientComponentClient();
@@ -89,7 +89,6 @@ const UnifiedNavigation = ({
     { href: '/templates', label: 'Templates', icon: <BarChart3 className="w-4 h-4" /> },
     { href: '/pricing', label: 'Pricing', icon: <CreditCard className="w-4 h-4" /> },
     { href: '/enterprise', label: 'Enterprise', icon: <Building2 className="w-4 h-4" /> },
-    { href: '/guide', label: 'ATS Guide', icon: <BookOpen className="w-4 h-4" /> },
   ];
 
 
@@ -214,7 +213,7 @@ const UnifiedNavigation = ({
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 py-1">
                     <Link
-                      href="/profile"
+                      href="/profiles"
                       className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
