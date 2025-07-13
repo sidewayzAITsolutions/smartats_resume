@@ -1,14 +1,16 @@
-// components/ResumeBuilder.tsx
-import { useEffect, useState, useRef } from 'react';
-import { useSupabase } from '../../hooks/useSupabase';
-import { useUsageTracking, UsageAction } from '@/lib/usage-tracking';
-import { toast } from 'react-hot-toast';
+// components/ResumeBuilder/ResumeBuilder.tsx
+import { useEffect, useState, useRef } from "react";
+import { useSupabase } from "../../hooks/useSupabase";
+import { useUsageTracking, UsageAction } from "@/lib/usage-tracking";
+import { toast } from "react-hot-toast";
 
 export function ResumeBuilder() {
   const supabase = useSupabase();
   const usageTracking = useUsageTracking(supabase);
   const [isSaving, setIsSaving] = useState(false);
-  const [sessionInterval, setSessionInterval] = useState<NodeJS.Timeout | null>(null);
+  const [sessionInterval, setSessionInterval] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   // Add resumeData state
   const [resumeData, setResumeData] = useState<any>({});
@@ -17,15 +19,17 @@ export function ResumeBuilder() {
   useEffect(() => {
     const init = async () => {
       await usageTracking.initialize();
-      
+
       // Set up session refresh interval
       const interval = setInterval(async () => {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (session) {
           await supabase.auth.refreshSession();
         }
       }, 20 * 60 * 1000); // Refresh every 20 minutes
-      
+
       setSessionInterval(interval);
     };
 
@@ -44,32 +48,41 @@ export function ResumeBuilder() {
       setIsSaving(true);
 
       // Check if user can perform save action
-      const canSave = await usageTracking.canPerformAction(UsageAction.RESUME_SAVE);
-      
+      const canSave = await usageTracking.canPerformAction(
+        UsageAction.RESUME_SAVE
+      );
+
       if (!canSave) {
-        const remaining = await usageTracking.getRemainingUses(UsageAction.RESUME_SAVE);
-        toast.error(`Daily save limit reached. Upgrade to Premium for unlimited saves!`);
-        
+        const remaining = await usageTracking.getRemainingUses(
+          UsageAction.RESUME_SAVE
+        );
+        toast.error(
+          `Daily save limit reached. Upgrade to Premium for unlimited saves!`
+        );
+
         // Show upgrade modal here
         showUpgradeModal();
         return;
       }
 
       // Refresh session before save to prevent timeout
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
       if (sessionError || !session) {
-        toast.error('Session expired. Please log in again.');
+        toast.error("Session expired. Please log in again.");
         // Redirect to login
         return;
       }
 
       // Save resume data
       const { data, error } = await supabase
-        .from('resumes')
+        .from("resumes")
         .upsert({
           user_id: session.user.id,
           data: resumeData,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -82,20 +95,21 @@ export function ResumeBuilder() {
       await usageTracking.trackUsage(UsageAction.RESUME_SAVE, {
         resume_id: data.id,
         template: resumeData.template,
-        sections_updated: Object.keys(resumeData).length
+        sections_updated: Object.keys(resumeData).length,
       });
 
       // Show remaining uses for free users
-      const remaining = await usageTracking.getRemainingUses(UsageAction.RESUME_SAVE);
+      const remaining = await usageTracking.getRemainingUses(
+        UsageAction.RESUME_SAVE
+      );
       if (remaining !== null && remaining > 0) {
         toast.success(`Resume saved! ${remaining} saves remaining today.`);
       } else {
-        toast.success('Resume saved successfully!');
+        toast.success("Resume saved successfully!");
       }
-
     } catch (error) {
-      console.error('Save error:', error);
-      toast.error('Failed to save resume. Please try again.');
+      console.error("Save error:", error);
+      toast.error("Failed to save resume. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -105,11 +119,17 @@ export function ResumeBuilder() {
   const handleATSScore = async () => {
     try {
       // Check if user can perform ATS scan
-      const canScan = await usageTracking.canPerformAction(UsageAction.ATS_SCAN);
-      
+      const canScan = await usageTracking.canPerformAction(
+        UsageAction.ATS_SCAN
+      );
+
       if (!canScan) {
-        const remaining = await usageTracking.getRemainingUses(UsageAction.ATS_SCAN);
-        toast.error(`Daily ATS scan limit reached. Upgrade to Premium for unlimited scans!`);
+        const remaining = await usageTracking.getRemainingUses(
+          UsageAction.ATS_SCAN
+        );
+        toast.error(
+          `Daily ATS scan limit reached. Upgrade to Premium for unlimited scans!`
+        );
         showUpgradeModal();
         return;
       }
@@ -120,25 +140,28 @@ export function ResumeBuilder() {
       // Track the usage
       await usageTracking.trackUsage(UsageAction.ATS_SCAN, {
         score: score,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Show remaining uses
-      const remaining = await usageTracking.getRemainingUses(UsageAction.ATS_SCAN);
+      const remaining = await usageTracking.getRemainingUses(
+        UsageAction.ATS_SCAN
+      );
       if (remaining !== null) {
-        toast.success(`ATS Score: ${score}%. ${remaining} scans remaining today.`);
+        toast.success(
+          `ATS Score: ${score}%. ${remaining} scans remaining today.`
+        );
       }
-
     } catch (error) {
-      console.error('ATS scoring error:', error);
-      toast.error('Failed to calculate ATS score.');
+      console.error("ATS scoring error:", error);
+      toast.error("Failed to calculate ATS score.");
     }
   };
 
   // Usage display component
   const UsageLimitDisplay = ({ action }: { action: UsageAction }) => {
     const [remaining, setRemaining] = useState<number | null>(null);
-    
+
     useEffect(() => {
       const fetchRemaining = async () => {
         const count = await usageTracking.getRemainingUses(action);
@@ -151,7 +174,7 @@ export function ResumeBuilder() {
 
     return (
       <div className="text-sm text-gray-600">
-        {remaining} {action.replace('_', ' ')}s remaining today
+        {remaining} {action.replace("_", " ")}s remaining today
       </div>
     );
   };
@@ -187,7 +210,7 @@ export function ResumeBuilder() {
         disabled={isSaving}
         className="save-button"
       >
-        {isSaving ? 'Saving...' : 'Save Resume'}
+        {isSaving ? "Saving..." : "Save Resume"}
       </button>
     </div>
   );
@@ -201,7 +224,7 @@ function useDebounce(func: Function, delay: number) {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       func(...args);
     }, delay);
@@ -212,9 +235,10 @@ export default ResumeBuilder;
 
 function showUpgradeModal() {
   // TODO: Replace with actual modal logic
-  alert('Upgrade to Premium to unlock unlimited saves and scans!');
+  alert("Upgrade to Premium to unlock unlimited saves and scans!");
 }
 function calculateATSScore() {
-  throw new Error('Function not implemented.');
+  throw new Error("Function not implemented.");
 }
+
 

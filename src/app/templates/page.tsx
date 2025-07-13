@@ -1168,7 +1168,7 @@ const EnhancedResumePreview: React.FC<{ template: TemplateType }> = ({ template 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black relative">
       {/* UnifiedNavigation */}
-      < UnifiedNavigation />
+      <UnifiedNavigation />
 
       {/* Premium Banner for Non-Premium Users - Top of Page */}
       {!isPremium && (
@@ -1197,7 +1197,7 @@ const EnhancedResumePreview: React.FC<{ template: TemplateType }> = ({ template 
           
           <h1 className="text-5xl font-bold text-white mb-4">
             Choose Your Perfect
-            <span className="block mt-2 bg-gradient-to-r from-teal-400 to-amber-400 bg-clip-text text-transparent">
+            <span className="block mt-2 text-gradient-primary from-teal-400 to-amber-400 bg-tranparent ">
               ATS-Beating Template
             </span>
           </h1>

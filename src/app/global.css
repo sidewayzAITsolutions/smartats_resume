@@ -1,53 +1,49 @@
-/* If you are not using Tailwind CSS, remove these lines. 
-   If you are using Tailwind, make sure your build process supports it. */
-/* @tailwind base; */
-/* @tailwind components; */
-/* @tailwind utilities; */
+/* Tailwind CSS directives */
+@tailwind base;
 
+@tailwind components;
+
+@tailwind utilities;
 
 /* CSS Custom Properties */
 :root {
   /* Teal Colors */
-  --teal-50: #E6F9F7;
-  --teal-100: #CEF2EF;
-  --teal-200: #A1E5DF;
-  --teal-300: #74D6CE;
-  --teal-400: #5BC7BE;
-  --teal-500: #42B8AD;
-  --teal-600: #389E95;
-  --teal-700: #2E847C;
-  --teal-800: #246A63;
-  --teal-900: #1A504B;
-
+  --teal-50: #e6f9f7;
+  --teal-100: #cef2ef;
+  --teal-200: #a1e5df;
+  --teal-300: #74d6ce;
+  --teal-400: #5bc7be;
+  --teal-500: #42b8ad;
+  --teal-600: #389e95;
+  --teal-700: #2e847c;
+  --teal-800: #246a63;
+  --teal-900: #1a504b;
   /* Gold Colors */
-  --gold-50: #FDFBF2;
-  --gold-100: #FCF6E3;
-  --gold-200: #F8ECC6;
-  --gold-300: #F3DEA7;
-  --gold-400: #EED08A;
-  --gold-500: #E8C270;
-  --gold-600: #E0B456;
-  --gold-700: #D4A136;
-  --gold-800: #B38534;
-  --gold-900: #96712C;
-
+  --gold-50: #fdfbf2;
+  --gold-100: #fcf6e3;
+  --gold-200: #f8ecc6;
+  --gold-300: #f3dea7;
+  --gold-400: #eed08a;
+  --gold-500: #e8c270;
+  --gold-600: #e0b456;
+  --gold-700: #d4a136;
+  --gold-800: #b38534;
+  --gold-900: #96712c;
   /* Cream Colors */
-  --cream: #F5E7CB;
-  --cream-light: #F9F2E0;
-
+  --cream: #f5e7cb;
+  --cream-light: #f9f2e0;
   /* Gray Colors */
-  --gray-bg: #F0F0F0;
-  --gray-50: #F9FAFB;
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  --gray-600: #4B5563;
+  --gray-bg: #f0f0f0;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
   --gray-700: #374151;
-  --gray-800: #1F2937;
+  --gray-800: #1f2937;
   --gray-900: #111827;
-
   /* Alpha Colors */
   --teal-alpha-10: rgba(26, 80, 75, 0.1);
   --teal-alpha-20: rgba(26, 80, 75, 0.2);
@@ -55,10 +51,9 @@
   --gold-alpha-10: rgba(212, 161, 54, 0.1);
   --gold-alpha-30: rgba(212, 161, 54, 0.3);
   --gold-alpha-50: rgba(212, 161, 54, 0.5);
-
   /* Theme Colors */
-  --background: #F0F0F0;
-  --foreground: #1A504B;
+  --background: #f0f0f0;
+  --foreground: #1a504b;
 }
 
 /* Main Background */
@@ -108,7 +103,11 @@
 
 /* Subtle Gradient */
 .gradient-subtle {
-  background: linear-gradient(to right, var(--teal-alpha-30), var(--gold-alpha-30));
+  background: linear-gradient(
+  to right,
+  var(--teal-alpha-30),
+  var(--gold-alpha-30)
+  );
 }
 
 /* Text Gradient */
@@ -191,7 +190,7 @@
 }
 
 .card-feature::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -224,7 +223,8 @@
   padding: 0.75rem 1rem;
   color: var(--teal-900);
   appearance: none;
-  background-image: url("data:image/svg+xml,..."); /* Add a custom dropdown arrow */
+  background-image: url("data:image/svg + xml,...");
+  /* Add a custom dropdown arrow */
 }
 
 /* Checkbox */
@@ -242,7 +242,7 @@
 }
 
 .checkbox:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   /* Checkmark styling */
 }
@@ -250,15 +250,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", sans-serif;
   line-height: 1.6;
 }
 
 /* Grid pattern background */
 .bg-grid-pattern {
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-image: linear-gradient(
+  rgba(255, 255, 255, 0.1) 1px,
+  transparent 1px
+  ),
+  linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -295,6 +298,7 @@ html {
     opacity: 0;
     transform: translateY(10px);
   }
+  
   to {
     opacity: 1;
     transform: translateY(0);
@@ -314,12 +318,17 @@ html {
 }
 
 /* Smooth transitions for all interactive elements */
-button, input, textarea, select {
+button,
+input,
+textarea,
+select {
   transition: all 0.2s ease;
 }
 
 /* Focus styles */
-input:focus, textarea:focus, select:focus {
+input:focus,
+  textarea:focus,
+  select:focus {
   outline: none;
   border-color: transparent;
   box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px #fff;
@@ -340,6 +349,7 @@ input:focus, textarea:focus, select:focus {
   from {
     transform: scaleX(0);
   }
+  
   to {
     transform: scaleX(1);
   }
@@ -352,9 +362,11 @@ input:focus, textarea:focus, select:focus {
 
 /* Pulse animation for ATS scoring */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
+  
   50% {
     opacity: 0.7;
   }
@@ -398,7 +410,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .btn-modern::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -421,7 +433,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .vertical-timeline::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 50%;
   top: 0;
@@ -459,7 +471,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* Mobile-first responsive design */
-@media (max-width: 768px) {
+@media (max-width:768px) {
   .vertical-layout {
     padding: 1rem;
   }
@@ -475,7 +487,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme:dark) {
   .dark-mode-support {
     background: #1e293b;
     color: #f1f5f9;
@@ -512,9 +524,11 @@ input:focus, textarea:focus, select:focus {
 }
 /* Pulse animation for live indicator */
 @keyframes pulse-blue {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
+  
   50% {
     opacity: 0.5;
   }
@@ -526,9 +540,11 @@ input:focus, textarea:focus, select:focus {
 
 /* Slow pulse animation for premium banners */
 @keyframes pulse-slow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
+  
   50% {
     opacity: 0.8;
   }
@@ -540,9 +556,11 @@ input:focus, textarea:focus, select:focus {
 
 /* Float animation */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
+  
   50% {
     transform: translateY(-20px);
   }

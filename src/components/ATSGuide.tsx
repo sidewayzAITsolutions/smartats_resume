@@ -1,17 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { FC } from 'react';
 import Link from 'next/link';
-import { 
-  CheckCircle, 
-  AlertTriangle, 
-  FileText, 
-  Eye, 
-  Search, 
-  Target, 
-  Zap, 
-  TrendingUp, 
-  Shield, 
+import {
+  CheckCircle,
+  AlertTriangle,
+  FileText,
+  Eye,
+  Search,
+  Target,
+  Zap,
+  TrendingUp,
+  Shield,
   Clock,
   Users,
   Award,
@@ -19,12 +19,12 @@ import {
   Sparkles
 } from 'lucide-react';
 
-const ATSGuide = () => {
+const ATSGuide: FC = () => {
   const stats = [
-    { number: "90%", label: "Fortune 500 companies use ATS", icon: <Users className="w-6 h-6" /> },
+    { number: "Over 90%", label: "Fortune 500 companies use ATS", icon: <Users className="w-6 h-6" /> },
     { number: "6 sec", label: "Average ATS scan time", icon: <Clock className="w-6 h-6" /> },
     { number: "75%", label: "Resumes filtered out by ATS", icon: <Shield className="w-6 h-6" /> },
-    { number: "3x", label: "Higher interview rate with optimization", icon: <TrendingUp className="w-6 h-6" /> },
+    { number: "3x", label: "Higher interview rate with optimization", icon: <TrendingUp className="w-6 h-6" /> }
   ];
 
   const tips = [
@@ -91,7 +91,7 @@ const ATSGuide = () => {
               <span className="text-gray-900">Get Noticed</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
-              Master Applicant Tracking Systems with our comprehensive guide. 
+              Master Applicant Tracking Systems with our comprehensive guide.
               Learn the secrets to getting your resume past automated filters and into human hands.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -147,14 +147,14 @@ const ATSGuide = () => {
                 An Applicant Tracking System (ATS) is software used by employers to collect, sort, scan, and rank job applications.
               </p>
             </div>
-            
+
             <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
               <div className="prose prose-lg max-w-none">
                 <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-                  Over 90% of Fortune 500 companies use ATS to filter resumes before human recruiters ever see them. 
+                  Over 90% of Fortune 500 companies use ATS to filter resumes before human recruiters ever see them.
                   These systems scan for keywords, formatting, and structure to determine if your resume matches the job requirements.
                 </p>
-                
+
                 <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 p-6 rounded-lg">
                   <div className="flex items-start">
                     <AlertTriangle className="w-6 h-6 text-yellow-600 mr-3 mt-1 flex-shrink-0" />
@@ -187,7 +187,7 @@ const ATSGuide = () => {
               Follow these proven strategies to ensure your resume passes ATS filters
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             {tips.map((tip, index) => (
               <div key={index} className="group bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
@@ -220,7 +220,7 @@ const ATSGuide = () => {
               Don't let these common errors prevent your resume from being seen
             </p>
           </div>
-          
+
           <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl">
             <div className="grid md:grid-cols-2 gap-8">
               {commonMistakes.map((item, index) => (
@@ -250,7 +250,7 @@ const ATSGuide = () => {
               Use this checklist to ensure your resume is ATS-ready
             </p>
           </div>
-          
+
           <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl">
             <div className="space-y-6">
               {checklistItems.map((item, index) => (

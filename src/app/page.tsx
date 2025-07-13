@@ -1,17 +1,17 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, JSX } from 'react';
 import { ArrowRight, CheckCircle, Zap, Shield, Star, Target, TrendingUp, BarChart2, X, Menu, Sparkles, Award, FileText, Clock, User } from 'lucide-react';
 import LogoSplashScreen from '@/components/LogoSplashScreen';
-import FloatingATSGuide from '@/components/FloatingATSGuide';
+
 
 type ATSDemoModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const EnhancedLandingPage = () => {
+const Page: React.FC = () => {
   const [showDemoModal, setShowDemoModal] = useState(false);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
   const [scrollY, setScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -25,37 +25,38 @@ const EnhancedLandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % 3);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
-  const testimonials = [
-    {
-      name: "Sarah Chen",
-      role: "Software Engineer",
-      company: "Microsoft",
-      content: "SmartATS helped me get past the ATS filters. Got 5 interviews in 2 weeks!",
-      gender: "female"
-    },
-    {
-      name: "Michael Rodriguez",
-      role: "Marketing Manager",
-      company: "Adobe",
-      content: "The keyword optimization is incredible. My interview rate went from 5% to 45%!",
-      gender: "male"
-    },
-    {
-      name: "Emily Johnson",
-      role: "Data Scientist",
-      company: "Google",
-      content: "Finally, a resume builder that understands ATS systems. Worth every penny!",
-      gender: "female"
-    }
-  ];
-  
+
+  const whyChooseSmartATS = {
+    title: "Why Choose SmartATS?",
+    subtitle: "Two game-changing features that set us apart from the competition",
+    features: [
+      {
+        title: "Advanced ATS Scorecard",
+        description: "Our proprietary ATS scoring algorithm analyzes your resume against real ATS systems used by Fortune 500 companies. Get instant feedback on keyword optimization, formatting compatibility, and section structure to ensure your resume passes through automated screening systems.",
+        icon: "📊",
+        highlights: [
+          "Real-time ATS compatibility scoring",
+          "Keyword density analysis",
+          "Format optimization recommendations",
+          "Industry-specific ATS insights"
+        ]
+      },
+      {
+        title: "AI-Powered Content Generation",
+        description: "Leverage cutting-edge artificial intelligence to craft compelling resume content that resonates with both ATS systems and human recruiters. Our AI understands industry trends, job requirements, and recruiter preferences to help you stand out.",
+        icon: "🤖",
+        highlights: [
+          "Intelligent bullet point generation",
+          "Industry-specific language optimization",
+          "Achievement quantification suggestions",
+          "Personalized content recommendations"
+        ]
+      }
+    ],
+    summary: "While other resume builders focus on templates, SmartATS focuses on results. Our ATS scorecard ensures your resume gets past automated filters, while our AI implementation helps you create content that impresses human recruiters. It's not just about looking good—it's about getting hired."
+  };
+
   const ATSDemoModal = ({ open, onClose }: ATSDemoModalProps) => {
     if (!open) return null;
 
@@ -63,7 +64,7 @@ const EnhancedLandingPage = () => {
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
         <div className="bg-gray-900 border border-gray-800 rounded-3xl shadow-2xl p-8 w-full max-w-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-teal-600/20 to-amber-600/20 rounded-full blur-3xl"></div>
-          
+
           <button
             type="button"
             onClick={onClose}
@@ -74,7 +75,7 @@ const EnhancedLandingPage = () => {
 
           <div className="relative z-10">
             <h2 className="text-3xl font-bold text-white mb-6">Live ATS Analysis Demo</h2>
-            
+
             <div className="bg-gradient-to-br from-teal-900/50 to-amber-900/50 border border-teal-700/50 rounded-2xl p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-lg font-semibold text-gray-200">ATS Score</span>
@@ -83,7 +84,7 @@ const EnhancedLandingPage = () => {
                   <TrendingUp className="w-6 h-6 text-green-400" />
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Keyword Match</span>
@@ -94,7 +95,7 @@ const EnhancedLandingPage = () => {
                     <span className="text-sm font-medium text-gray-300">92%</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Format Compatibility</span>
                   <div className="flex items-center gap-2">
@@ -104,7 +105,7 @@ const EnhancedLandingPage = () => {
                     <span className="text-sm font-medium text-gray-300">96%</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Readability Score</span>
                   <div className="flex items-center gap-2">
@@ -132,7 +133,7 @@ const EnhancedLandingPage = () => {
               onClick={() => {
                 onClose();
                 navigateTo('/templates');
-              }}
+              } }
               className="w-full bg-gradient-to-r from-teal-600 to-amber-600 text-white font-semibold py-4 px-8 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
             >
               Start Building Your ATS-Optimized Resume
@@ -156,7 +157,7 @@ const EnhancedLandingPage = () => {
             <img src="/horse-logo.png" alt="" className="w-full h-full object-contain" />
           </div>
         </div>
-
+     
         {/* Animated Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-teal-600/10 rounded-full blur-3xl animate-float"></div>
@@ -220,7 +221,7 @@ const EnhancedLandingPage = () => {
             )}
           </nav>
         </header>
-
+      
         {/* Hero Section */}
         <section className="relative pt-32 pb-20 px-6">
           <div className="max-w-6xl mx-auto text-center">
@@ -230,15 +231,15 @@ const EnhancedLandingPage = () => {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Smart ATS Resume
+              SmartATS Resume
               <span className="block mt-2 text-2xl md:text-3xl bg-gradient-to-r from-teal-400 to-amber-400 bg-clip-text text-transparent">
-                For The Love of Humanity
+                Getting People Back in Front of People
               </span>
             </h1>
 
             <p className="text-xl md:text-2xl text-red-400 mb-8 max-w-3xl mx-auto leading-relaxed">
-              <span className="font-bold text-gray-200">ATS makes a decision in 6 seconds or less!</span>   
-              <span className="font-bold text-red-200"> 75% of qualified candidates</span> get rejected by keyword mismatches.
+              <span className="font-bold text-gray-200">ATS makes a decision in 6 seconds or less!</span>
+              <span className="font-bold text-red-200"> 75% of qualified candidates get rejected by keyword mismatches.</span>
               Our AI ensures yours makes it to human eyes.
             </p>
 
@@ -262,11 +263,8 @@ const EnhancedLandingPage = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <BarChart2 className="w-5 h-5 text-teal-400" />
-                <span><strong className="text-gray-300">70%</strong> of resumes never reach humans</span>
-              </div>
+             <div className="flex flex-wrap items-center justify-center gap-4 text-md text-gray-500">
+             <div className="flex items-wrap items-center justify-center gap-8 text md text-gray-500">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-green-400" />
                 <span><strong className="text-gray-300">60%</strong> faster hiring with ATS optimization</span>
@@ -277,8 +275,18 @@ const EnhancedLandingPage = () => {
               </div>
             </div>
           </div>
+          </div>
         </section>
 
+        <section>
+          <div className="flex items-center justify-center gap-8 flex-col md:flex-row max-w-10xl mx-4 px-6 py-20 text-center">
+           <img src="/1.png" alt="Mascot" className="w-85 h-85 object-contain" />
+           <span className="text-7xl text-lime-300 font-bold bg-clip-text text-transparent bg-gradient-to-r from-lime-400 to-green-400">
+           <strong>"Not just Smart, SmartATS Smart"</strong>
+           </span>
+         </div>
+  </section>
+        
         {/* Problem/Solution Section */}
         <section className="py-20 px-6 relative">
           <div className="max-w-6xl mx-auto">
@@ -357,7 +365,7 @@ const EnhancedLandingPage = () => {
                 </span>
               </h2>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
@@ -398,7 +406,7 @@ const EnhancedLandingPage = () => {
                 }
               ].map((feature, idx) => {
                 const getColorClasses = (color: string) => {
-                  switch(color) {
+                  switch (color) {
                     case 'teal': return 'bg-teal-900/50 text-teal-400';
                     case 'green': return 'bg-green-900/50 text-green-400';
                     case 'amber': return 'bg-amber-900/50 text-amber-400';
@@ -408,7 +416,7 @@ const EnhancedLandingPage = () => {
                     default: return 'bg-gray-900/50 text-gray-400';
                   }
                 };
-                
+
                 return (
                   <div key={idx} className="group relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
@@ -564,65 +572,48 @@ const EnhancedLandingPage = () => {
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-900/30 to-green-800/30 border border-green-700/50 rounded-xl">
                 <Sparkles className="w-5 h-5 text-green-400" />
                 <p className="text-green-300 font-medium">
-                  SmartATS offers premium features at <span className="text-green-400 font-bold">60% less</span> than competitors
+                  SmartATS SAVES you DOLLARS! <span className="text-green-400 font-bold">30% more</span> than competitors
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Why Choose SmartATS */}
         <section className="py-20 px-6 bg-gradient-to-br from-gray-900 to-black">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-white mb-4">Success Stories</h2>
-              <p className="text-xl text-gray-400">Join thousands who beat the ATS and landed their dream jobs</p>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-white mb-4">{whyChooseSmartATS.title}</h2>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">{whyChooseSmartATS.subtitle}</p>
             </div>
 
-            <div className="relative">
-              <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-xl">
-                {testimonials.map((testimonial, idx) => (
-                  <div
-                    key={idx}
-                    className={`transition-all duration-500 ${idx === activeTestimonial ? 'opacity-100' : 'opacity-0 absolute inset-0 p-8'}`}
-                  >
-                    <div className="flex items-start gap-6">
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                        testimonial.gender === 'female' 
-                          ? 'bg-gradient-to-br from-pink-500 to-teal-500' 
-                          : 'bg-gradient-to-br from-blue-500 to-green-500'
-                      }`}>
-                        <User className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-1 mb-3">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                          ))}
-                        </div>
-                        <p className="text-lg text-gray-300 mb-4 italic">"{testimonial.content}"</p>
-                        <div>
-                          <p className="font-semibold text-white">{testimonial.name}</p>
-                          <p className="text-sm text-gray-500">{testimonial.role} at {testimonial.company}</p>
-                        </div>
-                      </div>
-                    </div>
+            <div className="grid lg:grid-cols-2 gap-8 mb-12">
+              {whyChooseSmartATS.features.map((feature, idx) => (
+                <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-teal-500/50 transition-all duration-300">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="text-4xl">{feature.icon}</div>
+                    <h3 className="text-2xl font-bold text-white">{feature.title}</h3>
                   </div>
-                ))}
-              </div>
 
-              <div className="flex justify-center gap-2 mt-6">
-                {testimonials.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveTestimonial(idx)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      idx === activeTestimonial ? 'w-8 bg-teal-500' : 'bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
+                  <p className="text-gray-300 mb-6 leading-relaxed">{feature.description}</p>
+
+                  <ul className="space-y-3">
+                    {feature.highlights.map((highlight, highlightIdx) => (
+                      <li key={highlightIdx} className="flex items-center gap-3 text-gray-300">
+                        <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                        <span>{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* Summary */}
+            <div className="bg-gradient-to-r from-teal-900/30 to-amber-900/30 border border-teal-500/30 rounded-2xl p-8 text-center">
+              <p className="text-lg text-gray-200 leading-relaxed max-w-4xl mx-auto">
+                {whyChooseSmartATS.summary}
+              </p>
             </div>
           </div>
         </section>
@@ -655,13 +646,13 @@ const EnhancedLandingPage = () => {
                       <User className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">Team Collaboration</h3>
-                      <p className="text-amber-200 text-sm">Streamline team workflows</p>
+                      <h3 className="text-xl font-bold text-white">Create in Bulk</h3>
+                      <p className="text-amber-200 text-sm">Unlimited Resumes</p>
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Enable seamless collaboration with shared workspaces, real-time editing,
-                    role-based permissions, and approval workflows for consistent quality control.
+                    Generate and manage unlimited resumes for your entire team with bulk creation
+                    and editing capabilities, streamlining the hiring process across departments.
                   </p>
                 </div>
 
@@ -692,15 +683,15 @@ const EnhancedLandingPage = () => {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Track hiring metrics, ATS performance, team productivity, and ROI with
-                    comprehensive dashboards and custom reporting capabilities.
+                    Put our ATS score card to work with detailed analytics on resume performance,
+                    candidate engagement, and team collaboration metrics to optimize your hiring strategy.
                   </p>
                 </div>
               </div>
 
               {/* Right side - ROI Stats */}
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-3xl p-8">
-                <h3 className="text-2xl font-bold text-white mb-8 text-center">Enterprise ROI Impact</h3>
+                <h3 className="text-2xl font-bold text-white mb-8 text-center">Projected Enterprise ROI Impact</h3>
 
                 <div className="space-y-6">
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-xl border border-green-700/30">
@@ -739,19 +730,13 @@ const EnhancedLandingPage = () => {
                 <div className="mt-8 p-4 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl text-center">
                   <div className="text-3xl font-bold text-white mb-1">$49.99</div>
                   <div className="text-amber-100 text-sm">per user/month</div>
-                  <div className="text-xs text-amber-200 mt-1">Billed annually • Volume discounts available</div>
+                  <div className="text-xs text-amber-200 mt-1">Billed annually</div>
                 </div>
               </div>
             </div>
 
             {/* Enterprise Features Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <div className="text-center p-6 bg-gray-800/50 rounded-xl border border-gray-700">
-                <FileText className="w-8 h-8 text-amber-400 mx-auto mb-3" />
-                <h4 className="font-semibold text-white mb-2">Bulk Creation</h4>
-                <p className="text-sm text-gray-400">Generate hundreds of resumes simultaneously with batch processing</p>
-              </div>
-
               <div className="text-center p-6 bg-gray-800/50 rounded-xl border border-gray-700">
                 <Shield className="w-8 h-8 text-amber-400 mx-auto mb-3" />
                 <h4 className="font-semibold text-white mb-2">Priority Support</h4>
@@ -823,7 +808,7 @@ const EnhancedLandingPage = () => {
                 </div>
                 <p className="text-sm">Beat the bots. Get the job.</p>
               </div>
-              
+
               <div>
                 <h4 className="font-semibold text-white mb-4">Product</h4>
                 <ul className="space-y-2 text-sm">
@@ -861,44 +846,11 @@ const EnhancedLandingPage = () => {
         {/* Demo Modal */}
         <ATSDemoModal open={showDemoModal} onClose={() => setShowDemoModal(false)} />
 
-        {/* Floating ATS Guide Widget */}
-        <FloatingATSGuide />
-
-        <style>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-          }
-          
-          @keyframes float-delayed {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-30px); }
-          }
-          
-          .animate-float {
-            animation: float 6s ease-in-out infinite;
-          }
-          
-          .animate-float-delayed {
-            animation: float-delayed 8s ease-in-out infinite;
-          }
-          
-          .animate-bounce-slow {
-            animation: bounce 3s ease-in-out infinite;
-          }
-          
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
-          }
-        `}</style>
       </div>
     </>
+ 
   );
-};
+}
 
-export default EnhancedLandingPage;
+export default Page;
+

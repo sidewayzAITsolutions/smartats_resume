@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu, X, Zap, User, FileText, BarChart3, LogOut, Loader2,
-  Save, Download, Eye, FileDown, FolderOpen, ChevronDown,
+  Eye, FileDown, ChevronDown,
   CreditCard, Building2, BookOpen, Crown, Plus, Briefcase, GraduationCap
 } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -15,18 +15,13 @@ interface UnifiedNavigationProps {
   // Builder-specific props
   resumeName?: string;
   saveStatus?: 'saved' | 'saving' | 'unsaved';
-  onSave?: () => void;
-  onLoad?: () => void;
   onPreview?: () => void;
   onExportPDF?: () => void;
-
 }
 
 const UnifiedNavigation = ({
   resumeName,
   saveStatus,
-  onSave,
-  onLoad,
   onPreview,
   onExportPDF
 }: UnifiedNavigationProps) => {
@@ -161,22 +156,6 @@ const UnifiedNavigation = ({
               <div className="hidden md:flex items-center space-x-3">
                 <button
                   type="button"
-                  onClick={onSave}
-                  className="flex items-center space-x-2 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Save</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={onLoad}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  <FolderOpen className="w-4 h-4" />
-                  <span>Load</span>
-                </button>
-                <button
-                  type="button"
                   onClick={onPreview}
                   className="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
                 >
@@ -299,28 +278,6 @@ const UnifiedNavigation = ({
                 <>
                   <hr className="border-gray-800" />
                   <div className="grid grid-cols-2 gap-2 px-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onSave?.();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center justify-center space-x-2 px-4 py-2 bg-pink-600 text-white rounded-lg"
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>Save</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onLoad?.();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
-                    >
-                      <FolderOpen className="w-4 h-4" />
-                      <span>Load</span>
-                    </button>
                     <button
                       type="button"
                       onClick={() => {

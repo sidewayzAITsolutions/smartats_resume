@@ -1,0 +1,28 @@
+{
+	"name": "Node.js & TypeScript",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/git-lfs:1": {},
+		"ghcr.io/customink/codespaces-features/docker-in-docker-amzn:1": {},
+		"ghcr.io/jlaundry/devcontainer-features/azure-functions-core-tools:1": {},
+		"ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
+		"ghcr.io/kvokka/features/aicommit2:1": {},
+		"ghcr.io/kvokka/features/codegpt:1": {},
+		"ghcr.io/dlouwers/devcontainer-features/bob:1": {},
+		"ghcr.io/dlouwers/devcontainer-features/devbox:1": {},
+		"ghcr.io/bartventer/arch-devcontainer-features/docker-in-docker:1": {},
+		"ghcr.io/code-fabrik/features/dokku-cli:1": {},
+		"ghcr.io/devcontainers-extra/features/apt-packages:1": {},
+		"ghcr.io/devcontainers-extra/features/auditjs:1": {},
+		"ghcr.io/devcontainers-extra/features/autoenv:1": {},
+		"ghcr.io/devcontainers-extra/features/azure-apiops:1": {},
+		"ghcr.io/devcontainers-extra/features/cmake:1": {},
+		"ghcr.io/devcontainers-extra/features/datasette:2": {},
+		"ghcr.io/devcontainers-extra/features/devcontainers-cli:1": {},
+		"ghcr.io/devcontainers-extra/features/dive:1": {},
+		"ghcr.io/davzucky/devcontainers-features-wolfi/docker-outside-of-docker:1": {},
+		"ghcr.io/thediveo/devcontainer-features/docsify:0": {},
+		"ghcr.io/coder/devcontainer-features/code-server:1": {}
+	}
+}
